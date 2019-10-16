@@ -88,7 +88,7 @@ export default function TripContainer(props) {
     return (
         <div className={classes.root}>
             {isPlaying &&
-                <div class="stars"></div>
+                <div className="stars"></div>
             }
             <Grid container spacing={3} className={classes.grid}>
                 <Grid item xs>

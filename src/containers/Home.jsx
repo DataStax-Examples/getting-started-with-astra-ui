@@ -14,6 +14,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Journeys from './Journeys';
 import TripContainer from './TripContainer';
+import AddJourneyDialog from './AddJourneyDialog';
 
 const drawerWidth = 240;
 
@@ -79,25 +80,27 @@ export default function Home() {
   const [open, setOpen] = React.useState(false);
   const [spacecraft, setSpacecraft] = React.useState([]);
   const [journeyReadings, setJourneyReadings] = React.useState({});
+  const [openAddJourneyDialog, setOpenAddJourneyDialog] = React.useState(false);
 
   //fetch the spacecraft
   React.useEffect(() => {
-    async function fetchData() {
-      const result = await axios(
-        'https://localhost:5001/api/spacecraft',
-      );
-      setSpacecraft(result.data);
-    }
-    fetchData();
+    fetchJourneys();
   }, []);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+  const fetchJourneys = async () => {
+    const result = await axios(
+      'https://localhost:5001/api/spacecraft',
+    );
+    setSpacecraft(result.data);
+  }
+
+  const toggleDrawer = () => {
+    setOpen(!open);
   };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  const toggleAddJourneyDialog = () => {
+    setOpenAddJourneyDialog(!openAddJourneyDialog);
+  }
 
   const fetchJourneyReadings = (spacecraftName, journeyId) => {
     async function fetchData() {
@@ -113,6 +116,13 @@ export default function Home() {
     fetchData();
   }
 
+  const launchNewJourney = async (spacecraftName) => {
+    const result = await axios.post(
+      'https://localhost:5001/api/spacecraft/' + spacecraftName,
+    );
+    fetchJourneys();
+  }
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -126,7 +136,7 @@ export default function Home() {
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={toggleDrawer}
             edge="start"
             className={clsx(classes.menuButton, open && classes.hide)}
           >
@@ -147,12 +157,15 @@ export default function Home() {
         }}
       >
         <div className={classes.drawerHeader}>
-          <IconButton onClick={handleDrawerClose}>
+          <IconButton onClick={toggleDrawer}>
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </div>
         <Divider />
-        <Journeys onClose={handleDrawerClose} spacecraft={spacecraft} fetchJourney={fetchJourneyReadings} />
+        <Journeys onClose={toggleDrawer}
+          onAddJourneyClick={toggleAddJourneyDialog}
+          spacecraft={spacecraft}
+          fetchJourney={fetchJourneyReadings} />
       </Drawer>
       <main
         className={clsx(classes.content, {
@@ -163,6 +176,7 @@ export default function Home() {
         </div>
         <TripContainer data={journeyReadings} />
       </main>
+      <AddJourneyDialog open={openAddJourneyDialog} handleClose={toggleAddJourneyDialog} launchJourney={launchNewJourney} />
     </div>
   );
 }
