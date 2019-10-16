@@ -100,20 +100,15 @@ export default function Home() {
   };
 
   const fetchJourneyReadings = (spacecraftName, journeyId) => {
-    console.log(spacecraftName);
-    console.log(journeyId);
-
     async function fetchData() {
       axios.all([
-        axios.get('https://localhost:5001/api/spacecraft/#{spacecraftName}/#{journeyId}/instruments/temperature'),
-        axios.get('https://localhost:5001/api/spacecraft/#{spacecraftName}/#{journeyId}/instruments/pressure'),
-        axios.get('https://localhost:5001/api/spacecraft/#{spacecraftName}/#{journeyId}/instruments/location'),
-        axios.get('https://localhost:5001/api/spacecraft/#{spacecraftName}/#{journeyId}/instruments/speed')
+        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/temperature'),
+        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/pressure'),
+        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/location'),
+        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/speed')
       ]).then(responseArr => {
-        setJourneyReadings({ temperature: responseArr[0], pressure: responseArr[1], location: responseArr[2], speed: responseArr[3] });
-      })
-        ;
-
+        setJourneyReadings({ temperature: responseArr[0].data, pressure: responseArr[1].data, location: responseArr[2].data, speed: responseArr[3].data });
+      });
     }
     fetchData();
   }
