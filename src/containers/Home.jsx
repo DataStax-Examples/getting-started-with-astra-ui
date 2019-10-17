@@ -12,11 +12,14 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import Snackbar from '@material-ui/core/Snackbar';
 import Journeys from './Journeys';
 import TripContainer from './TripContainer';
 import AddJourneyDialog from './AddJourneyDialog';
+import logo from '../assets/logo-white.svg'
 
 const drawerWidth = 240;
+const pageSize = 25;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -27,6 +30,7 @@ const useStyles = makeStyles(theme => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+    backgroundColor: "#0C153A"
   },
   appBarShift: {
     width: `calc(100% - #{drawerWidth}px)`,
@@ -80,7 +84,10 @@ export default function Home() {
   const [open, setOpen] = React.useState(false);
   const [spacecraft, setSpacecraft] = React.useState([]);
   const [journeyReadings, setJourneyReadings] = React.useState({});
+  const [readingsPageStates, setReadingsPageStates] = React.useState({ temperature: "", pressure: "", location: "", speed: "" });
   const [openAddJourneyDialog, setOpenAddJourneyDialog] = React.useState(false);
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState(false);
 
   //fetch the spacecraft
   React.useEffect(() => {
@@ -102,26 +109,74 @@ export default function Home() {
     setOpenAddJourneyDialog(!openAddJourneyDialog);
   }
 
-  const fetchJourneyReadings = (spacecraftName, journeyId) => {
-    async function fetchData() {
-      axios.all([
-        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/temperature'),
-        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/pressure'),
-        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/location'),
-        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/speed')
-      ]).then(responseArr => {
-        setJourneyReadings({ temperature: responseArr[0].data, pressure: responseArr[1].data, location: responseArr[2].data, speed: responseArr[3].data });
-      });
-    }
-    fetchData();
+
+  const toggleSnackbar = () => {
+    setOpenSnackbar(!openSnackbar);
+  };
+
+  const sendSnackbarMessage = (message) => {
+    setSnackbarMessage(message);
+    setOpenSnackbar(true);
   }
 
-  const launchNewJourney = async (spacecraftName) => {
+  const fetchJourneyReadings = (spacecraftName, journeyId) => {
+    async function fetchData(readingsPageStates, readings) {
+      axios.all([
+        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/temperature?pagesize=' + pageSize + readingsPageStates.temperature),
+        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/pressure?pagesize=' + pageSize + readingsPageStates.pressure),
+        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/location?pagesize=' + pageSize + readingsPageStates.location),
+        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/speed?pagesize=' + pageSize + readingsPageStates.speed)
+      ]).then(responseArr => {
+        //Concatenate all the results to the existing array
+        readings.temperature.push(...responseArr[0].data.data);
+        readings.pressure.push(...responseArr[1].data.data);
+        readings.location.push(...responseArr[2].data.data);
+        readings.speed.push(...responseArr[3].data.data);
+        setJourneyReadings(readings);
+        //Store the page states for the next loop through
+        readingsPageStates = {
+          temperature: "&pagestate=" + encodeURIComponent(responseArr[0].data.pageState),
+          pressure: "&pagestate=" + encodeURIComponent(responseArr[1].data.pageState),
+          location: "&pagestate=" + encodeURIComponent(responseArr[2].data.pageState),
+          speed: "&pagestate=" + encodeURIComponent(responseArr[3].data.pageState)
+        };
+        //If we are not at the end then fetch more data
+        if (responseArr[0].data.data && responseArr[0].data.data.length > 0) {
+          fetchData(readingsPageStates, readings);
+          console.log("fetching more data")
+        } else {
+          console.log("All data fetched")
+        }
+      });
+    }
+    fetchData({
+      temperature: "",
+      pressure: "",
+      location: "",
+      speed: ""
+    },
+      {
+        temperature: [],
+        pressure: [],
+        location: [],
+        speed: []
+      });
+  }
+
+  const launchNewJourney = async (spacecraftName, summary) => {
+    var data = JSON.stringify(summary);
     const result = await axios.post(
       'https://localhost:5001/api/spacecraft/' + spacecraftName,
+      JSON.stringify(summary),
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
     );
     fetchJourneys();
   }
+
 
   return (
     <div className={classes.root}>
@@ -142,7 +197,12 @@ export default function Home() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
+          <img
+            src={logo}
+            alt="DataStax Logo"
+            height="36px"
+            width="174px" />
+          <Typography variant="h6" noWrap style={{ paddingLeft: theme.spacing(2) }}>
             Getting Started with Apollo
           </Typography>
         </Toolbar>
@@ -174,9 +234,22 @@ export default function Home() {
       >
         <div className={classes.drawerHeader}>
         </div>
-        <TripContainer data={journeyReadings} />
+        <TripContainer data={journeyReadings} sendMessage={sendSnackbarMessage} />
       </main>
       <AddJourneyDialog open={openAddJourneyDialog} handleClose={toggleAddJourneyDialog} launchJourney={launchNewJourney} />
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={toggleSnackbar}
+        ContentProps={{
+          'aria-describedby': 'message-id',
+        }}
+        message={<span id="message-id">{snackbarMessage}</span>}
+      />
     </div>
   );
 }

@@ -6,27 +6,23 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import PersonIcon from '@material-ui/icons/Person';
-import AddIcon from '@material-ui/icons/Add';
 import { blue } from '@material-ui/core/colors';
 import TextField from '@material-ui/core/TextField';
 
-const useStyles = makeStyles({
-    avatar: {
-        backgroundColor: blue[100],
-        color: blue[600],
-    },
-});
-
 export default function AddJourneyDialog(props) {
     const [spacecraftName, setSpacecraftName] = useState(null);
+    const [summary, setSummary] = useState(null);
 
     function updateSpacecraftName(target) {
         setSpacecraftName(target.currentTarget.value);
     }
 
+    function updateSummary(target) {
+        setSummary(target.currentTarget.value);
+    }
+
     function onLaunch() {
-        props.launchJourney(spacecraftName);
+        props.launchJourney(spacecraftName, summary);
         props.handleClose();
     };
 
@@ -36,7 +32,7 @@ export default function AddJourneyDialog(props) {
                 <DialogTitle id="form-dialog-title">Launch a Spacecraft</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Enter the name of the Spacecraft you would like to send on a journey:
+                        Enter the details below and press "Launch " to create a new journey:
                     </DialogContentText>
                     <TextField
                         autoFocus
@@ -47,6 +43,15 @@ export default function AddJourneyDialog(props) {
                         fullWidth
                         required
                         onChange={updateSpacecraftName}
+                    />
+                    <TextField
+                        margin="dense"
+                        id="summary"
+                        label="Journey Summary"
+                        type="text"
+                        multiline
+                        fullWidth
+                        onChange={updateSummary}
                     />
                 </DialogContent>
                 <DialogActions>

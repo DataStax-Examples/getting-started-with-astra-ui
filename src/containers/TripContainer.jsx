@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import ReactSpeedometer from "react-d3-speedometer";
 import Button from '@material-ui/core/Button';
+import { Scatter } from 'react-chartjs-2';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -25,6 +26,12 @@ const useStyles = makeStyles(theme => ({
         textAlign: 'center',
         color: theme.palette.text.secondary,
     },
+    gauge: {
+        padding: theme.spacing(2),
+        height: 200,
+        border: "solid 1px #585858",
+        backgroundColor: "black"
+    }
 }));
 
 export default function TripContainer(props) {
@@ -32,7 +39,13 @@ export default function TripContainer(props) {
     const [temperatureGauge, setTemperatureGauge] = useState({ min: 0, max: 100, units: "fahrenheit" });
     const [pressureGauge, setPressureGauge] = useState({ min: 90, max: 105, units: "kPa" });
     const [speedGauge, setSpeedGauge] = useState({ min: 20000, max: 40000, units: "km/h" });
-    const [currentValues, setCurrentValues] = useState({ temperature: null, pressure: null, speed: null, index: 0 });
+    const [currentValues, setCurrentValues] = useState({
+        temperature: null,
+        pressure: null,
+        speed: null,
+        location: { x_coordinate: 0, y_coordinate: 0, z_coordinate: 0 },
+        index: 0
+    });
     const [currentInterval, setCurrentInterval] = useState(100);
     const [isPlaying, setIsPlaying] = useState(false);
     const [data, setData] = useState(props.data);
@@ -52,8 +65,12 @@ export default function TripContainer(props) {
                 temperature: data.temperature[currentValues.index].temperature,
                 pressure: data.pressure[currentValues.index].pressure,
                 speed: data.speed[currentValues.index].speed,
+                location: data.location[currentValues.index].location,
                 index: newIndex
             });
+            if (newIndex === data.temperature.length - 1) {
+                props.sendMessage("Your Journey is Complete")
+            }
         } else {
             setIsPlaying(false);
         }
@@ -85,6 +102,63 @@ export default function TripContainer(props) {
         }, [delay]);
     }
 
+    const locationData = {
+        labels: ['Scatter'],
+        datasets: [
+            {
+                label: 'My First dataset',
+                fill: false,
+                backgroundColor: 'white',
+                color: 'green',
+                pointBorderColor: 'green',
+                pointBackgroundColor: '#fff',
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+                pointHoverBorderColor: 'rgba(220,220,220,1)',
+                pointHoverBorderWidth: 2,
+                pointRadius: 3,
+                pointHitRadius: 10,
+                data: [
+                    {
+                        x: currentValues.location ? currentValues.location.x_coordinate : 0,
+                        y: currentValues.location ? currentValues.location.y_coordinate : 0,
+                    }
+                ]
+            }
+        ]
+    };
+
+    const optionsCustom = {
+        responsive: true,
+        tooltips: {
+            mode: 'label'
+        },
+        elements: {
+            line: {
+                fill: false
+            }
+        },
+        scales: {
+            xAxes: [{
+                type: 'linear',
+                ticks: {
+                    min: 10000,
+                    max: 15000
+                },
+                display: false
+            }],
+            yAxes: [{
+                type: 'linear',
+                ticks: {
+                    min: 10000,
+                    max: 15000
+                },
+                display: false
+            }],
+        }
+    };
+
     return (
         <div className={classes.root}>
             {isPlaying &&
@@ -92,7 +166,7 @@ export default function TripContainer(props) {
             }
             <Grid container spacing={3} className={classes.grid}>
                 <Grid item xs>
-                    <Paper className={classes.paper}>
+                    <div className={classes.gauge}>
                         <ReactSpeedometer
                             minValue={temperatureGauge.min}
                             maxValue={temperatureGauge.max}
@@ -100,21 +174,24 @@ export default function TripContainer(props) {
                             currentValueText={"Temperature: ${value} " + temperatureGauge.units}
                             segmentColors={['green', 'limegreen', 'yellow', 'orange', 'red']}
                         />
-                    </Paper>
+                    </div>
                 </Grid>
                 <Grid item xs>
-                    <Paper className={classes.paper}>
+                    <div className={classes.gauge}>
                         <ReactSpeedometer
                             minValue={speedGauge.min}
                             maxValue={speedGauge.max}
                             value={currentValues.speed}
                             currentValueText={"Speed: ${value} " + speedGauge.units}
                             segmentColors={['green', 'limegreen', 'yellow', 'orange', 'red']}
+                            style={{
+                                border: "solid 1px red"
+                            }}
                         />
-                    </Paper>
+                    </div>
                 </Grid>
                 <Grid item xs>
-                    <Paper className={classes.paper}>
+                    <div className={classes.gauge}>
                         <ReactSpeedometer
                             minValue={pressureGauge.min}
                             maxValue={pressureGauge.max}
@@ -122,13 +199,34 @@ export default function TripContainer(props) {
                             currentValueText={"Pressure: ${value} " + pressureGauge.units}
                             segmentColors={['green', 'limegreen', 'yellow', 'orange', 'red']}
                         />
-                    </Paper>
+                    </div>
+                </Grid>
+
+                <Grid item xs>
+                    <div className={classes.gauge}>
+                        <Scatter data={locationData} options={optionsCustom} legend={{ display: false }} />
+                    </div>
                 </Grid>
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
                         <Button variant="contained" className={classes.button} onClick={togglePlayback} disabled={!props.data.temperature}>
-                            {isPlaying ? "Stop" : "Start"}
+                            {isPlaying ? "Stop Playback" : "Start Playback"}
                         </Button>
+                    </Paper>
+                </Grid>
+                <Grid item xs>
+                    <Paper className={classes.paper}>
+                        What is currently being written
+                    </Paper>
+                </Grid>
+                <Grid item xs>
+                    <Paper className={classes.paper}>
+                        Currently Loaded {props.data.temperature ? props.data.temperature.length : "no"} rows from Apollo
+                    </Paper>
+                </Grid>
+                <Grid item xs>
+                    <Paper className={classes.paper}>
+                        Currently Displaying Index: {currentValues.index}
                     </Paper>
                 </Grid>
             </Grid>
