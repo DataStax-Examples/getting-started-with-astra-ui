@@ -20,9 +20,11 @@ import logo from '../assets/logo-white.svg'
 import CredentialsDialog from './CredentialsDialog'
 import { amber, green } from '@material-ui/core/colors';
 import SnackbarContentWrapper from './SnackbarContentWrapper';
+import LaunchDialog from './LaunchDialog';
 
 const drawerWidth = 240;
 const pageSize = 25;
+const writeBatchSize = 100;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -92,6 +94,10 @@ export default function Home() {
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState(false);
   const [snackbarClass, setSnackbarClass] = React.useState("info");
+  const [currentReadMessage, setCurrentReadMessage] = React.useState("Waiting for next launch");
+  const [currentWriteMessage, setCurrentWriteMessage] = React.useState("Waiting for next launch");
+  const [openLaunchDialog, setOpenLaunchDialog] = React.useState(false);
+  const [autoPlay, setAutoPlay] = React.useState(false);
 
   //fetch the spacecraft
   React.useEffect(() => {
@@ -121,11 +127,22 @@ export default function Home() {
   };
 
   const toggleAddJourneyDialog = () => {
+    if (!openAddJourneyDialog) {
+      setOpen(false);
+    }
     setOpenAddJourneyDialog(!openAddJourneyDialog);
   }
 
   const toggleAddCredsDialog = () => {
+    if (!openAddCreds) {
+      setOpen(false);
+    }
     setOpenAddCreds(!openAddCreds);
+  }
+
+  const toggleLaunchDialog = () => {
+    setAutoPlay(openLaunchDialog);
+    setOpenLaunchDialog(!openLaunchDialog);
   }
 
   const toggleSnackbar = () => {
@@ -162,9 +179,9 @@ export default function Home() {
         //If we are not at the end then fetch more data
         if (responseArr[0].data.data && responseArr[0].data.data.length > 0) {
           fetchData(readingsPageStates, readings);
-          console.log("fetching more data")
+          setCurrentReadMessage("Reading rows " + readings.temperature.length);
         } else {
-          console.log("All data fetched")
+          setCurrentReadMessage("All rows read for this launch");
         }
       });
     }
@@ -182,17 +199,87 @@ export default function Home() {
       });
   }
 
+  const sendJourneyReadings = async (index, spacecraftName, journeyId, temperature, pressure, speed, location) => {
+    if (index < 1000) {
+      axios.all([
+        axios.post('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/temperature', temperature.slice(index, writeBatchSize + index)),
+        axios.post('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/pressure', pressure.slice(index, writeBatchSize + index)),
+        axios.post('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/location', location.slice(index, writeBatchSize + index)),
+        axios.post('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/speed', speed.slice(index, writeBatchSize + index))
+      ]).then(responseArr => {
+        setCurrentWriteMessage("Writing records " + index + " of " + temperature.length);
+        sendJourneyReadings(index + writeBatchSize, spacecraftName, journeyId, temperature, pressure, speed, location)
+
+        if (index === writeBatchSize * 4) {
+          fetchJourneyReadings(spacecraftName, journeyId);
+        }
+      });
+    } else {
+      setCurrentWriteMessage("All rows have been written for this launch");
+    }
+  }
+
   const launchNewJourney = async (spacecraftName, summary) => {
-    var data = JSON.stringify(summary);
+    setOpenLaunchDialog(true);
     const result = await axios.post(
       'https://localhost:5001/api/spacecraft/' + spacecraftName,
-      JSON.stringify(summary),
+      JSON.stringify(summary || ""),
       {
         headers: {
           'Content-Type': 'application/json'
         }
       }
-    );
+    ).then(res => {
+      var journeyId = res.data;
+      var now = Date.now();
+      var i = 0;
+      var temperature = []; //create 1000 random samples with values between 69 and 71
+      for (i = 0; i < 1000; i++) {
+        temperature.push({
+          spacecraft_name: spacecraftName,
+          journey_id: journeyId,
+          temperature: 69 + (Math.random() * 2),
+          reading_time: new Date(now + (i * 1000)),
+          temperature_unit: "fahrenheit"
+        })
+      }
+      var pressure = []; //create 1000 random samples with values between 99 and 101
+      for (i = 0; i < 1000; i++) {
+        pressure.push({
+          spacecraft_name: spacecraftName,
+          journey_id: journeyId,
+          pressure: 99 + (Math.random() * 2),
+          reading_time: new Date(now + (i * 1000)),
+          pressure_unit: "kPa"
+        })
+      }
+      var speed = []; //30
+      for (i = 0; i < 1000; i++) {
+        speed.push({
+          spacecraft_name: spacecraftName,
+          journey_id: journeyId,
+          speed: 30000 + (Math.random() * 5000),
+          reading_time: new Date(now + (i * 1000)),
+          speed_unit: "km/h"
+        })
+      }
+      var location = [];
+      for (i = 0; i < 1000; i++) {
+        location.push({
+          spacecraft_name: spacecraftName,
+          journey_id: journeyId,
+          location: {
+            x_coordinate: 12000 + (i * 3),
+            y_coordinate: 12000 + (i * 3),
+            z_coordinate: 12000 + (i * 3)
+          },
+          reading_time: new Date(now + (i * 1000)),
+          location_unit: "km,km,km"
+        })
+      }
+      //Now save this off 50 at a time
+      sendJourneyReadings(0, spacecraftName, journeyId, temperature, pressure, speed, location);
+    });
     fetchJourneys();
   }
 
@@ -223,7 +310,7 @@ export default function Home() {
         }
       }
     ).then((res) => {
-      sendSnackbarMessage("Test Successful", "success");
+      sendSnackbarMessage("Database Credentials Saved", "success");
       fetchJourneys();
       toggleAddCredsDialog();
     }
@@ -257,7 +344,7 @@ export default function Home() {
             alt="DataStax Logo"
             height="36px"
             width="174px" />
-          <Typography variant="h6" noWrap style={{ paddingLeft: theme.spacing(2) }}>
+          <Typography variant="h3" noWrap style={{ paddingLeft: theme.spacing(2) }}>
             Getting Started with Apollo
           </Typography>
         </Toolbar>
@@ -291,10 +378,17 @@ export default function Home() {
       >
         <div className={classes.drawerHeader}>
         </div>
-        <TripContainer data={journeyReadings} sendMessage={sendSnackbarMessage} />
+        <TripContainer
+          data={journeyReadings}
+          sendMessage={sendSnackbarMessage}
+          currentWriteMessage={currentWriteMessage}
+          currentReadMessage={currentReadMessage}
+          autoPlay={autoPlay}
+        />
       </main>
       <AddJourneyDialog open={openAddJourneyDialog} handleClose={toggleAddJourneyDialog} launchJourney={launchNewJourney} />
       <CredentialsDialog open={openAddCreds} handleClose={toggleAddCredsDialog} handleTest={testNewCreds} handleSave={addNewCreds} />
+      <LaunchDialog open={openLaunchDialog} handleClose={toggleLaunchDialog} />
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',

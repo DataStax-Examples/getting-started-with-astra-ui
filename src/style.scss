@@ -1,3 +1,26 @@
+@font-face {
+  font-family: 'ProximaNova';
+  src: url('./fonts/ProximaNova-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'ProximaNova';
+  src: url('./fonts/ProximaNova-Light.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'ProximaNova';
+  src: url('./fonts/ProximaNova-Semibold.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+body {
+    color: 'green' !important
+}
+
 .container {
     margin: auto;
     text-align: center;
@@ -5,7 +28,6 @@
         width: 100px;
         height: auto;
     }
-    color: 'green'
 }
 
 .left {

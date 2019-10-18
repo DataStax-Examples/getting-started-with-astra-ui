@@ -55,6 +55,10 @@ export default function TripContainer(props) {
         setIsPlaying(!isPlaying);
     }
 
+    useEffect(() => {
+        setIsPlaying(props.autoPlay);
+    }, [props.autoPlay])
+
     useInterval(() => {
         if (isPlaying && data.temperature
             && currentValues.index < data.temperature.length
@@ -62,9 +66,9 @@ export default function TripContainer(props) {
             && currentValues.index < data.speed.length) {
             var newIndex = currentValues.index + 1;
             setCurrentValues({
-                temperature: data.temperature[currentValues.index].temperature,
-                pressure: data.pressure[currentValues.index].pressure,
-                speed: data.speed[currentValues.index].speed,
+                temperature: data.temperature[currentValues.index].temperature.toPrecision(4),
+                pressure: data.pressure[currentValues.index].pressure.toPrecision(4),
+                speed: data.speed[currentValues.index].speed.toPrecision(7),
                 location: data.location[currentValues.index].location,
                 index: newIndex
             });
@@ -106,18 +110,17 @@ export default function TripContainer(props) {
         labels: ['Scatter'],
         datasets: [
             {
-                label: 'My First dataset',
                 fill: false,
-                backgroundColor: 'white',
+                backgroundColor: 'green',
                 color: 'green',
                 pointBorderColor: 'green',
-                pointBackgroundColor: '#fff',
+                pointBackgroundColor: 'green',
                 pointBorderWidth: 1,
                 pointHoverRadius: 5,
                 pointHoverBackgroundColor: 'rgba(75,192,192,1)',
                 pointHoverBorderColor: 'rgba(220,220,220,1)',
                 pointHoverBorderWidth: 2,
-                pointRadius: 3,
+                pointRadius: 7,
                 pointHitRadius: 10,
                 data: [
                     {
@@ -130,7 +133,8 @@ export default function TripContainer(props) {
     };
 
     const optionsCustom = {
-        responsive: true,
+        responsive: false,
+        maintainAspectRation: false,
         tooltips: {
             mode: 'label'
         },
@@ -144,17 +148,25 @@ export default function TripContainer(props) {
                 type: 'linear',
                 ticks: {
                     min: 10000,
-                    max: 15000
+                    max: 15000,
+                    display: false
                 },
-                display: false
+                display: true,
+                gridLines: {
+                    color: "green",
+                }
             }],
             yAxes: [{
                 type: 'linear',
                 ticks: {
                     min: 10000,
-                    max: 15000
+                    max: 15000,
+                    display: false
                 },
-                display: false
+                display: true,
+                gridLines: {
+                    color: "green",
+                }
             }],
         }
     };
@@ -203,25 +215,23 @@ export default function TripContainer(props) {
                 </Grid>
 
                 <Grid item xs>
-                    <div className={classes.gauge}>
+                    <div className={classes.gauge} style={{ border: "none", marginTop: -15 }}>
                         <Scatter data={locationData} options={optionsCustom} legend={{ display: false }} />
                     </div>
                 </Grid>
                 <Grid item xs={12}>
+                    <Button variant="contained" className={classes.button} onClick={togglePlayback} disabled={!props.data.temperature}>
+                        {isPlaying ? "Stop Playback" : "Start Playback"}
+                    </Button>
+                </Grid>
+                <Grid item xs>
                     <Paper className={classes.paper}>
-                        <Button variant="contained" className={classes.button} onClick={togglePlayback} disabled={!props.data.temperature}>
-                            {isPlaying ? "Stop Playback" : "Start Playback"}
-                        </Button>
+                        {props.currentWriteMessage}
                     </Paper>
                 </Grid>
                 <Grid item xs>
                     <Paper className={classes.paper}>
-                        What is currently being written
-                    </Paper>
-                </Grid>
-                <Grid item xs>
-                    <Paper className={classes.paper}>
-                        Currently Loaded {props.data.temperature ? props.data.temperature.length : "no"} rows from Apollo
+                        {props.currentReadMessage}
                     </Paper>
                 </Grid>
                 <Grid item xs>

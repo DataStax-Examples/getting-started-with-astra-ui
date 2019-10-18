@@ -43,6 +43,10 @@ module.exports = {
           limit: 10000,
         },
       },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        loader: "file-loader"
+      }
     ],
   },
   resolve: {

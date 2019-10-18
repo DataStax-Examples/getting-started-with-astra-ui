@@ -50,22 +50,24 @@ export default function Journeys(props) {
         <List
             component="nav"
             className={classes.root}
+            dense
         >
             <ListItem button onClick={props.onAddCreds}>
-                <AddCircleOutlineIcon style={{ paddingRight: 5 }} />
-                <ListItemText primary="Set Creds" />
+                <ListItemText primary="Set Credentials" />
             </ListItem>
             <ListItem button onClick={props.onAddJourneyClick}>
-                <AddCircleOutlineIcon style={{ paddingRight: 5 }} />
-                <ListItemText primary="Add a Journey" />
+                <ListItemText primary="Launch a Journey" />
             </ListItem>
             <ListItem button onClick={handleClick}>
-                <ListItemText primary={"Spacecraft (" + names.length + ")"} />
+                <ListItemText primary={"Replay Journey"} />
                 {open ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <MuiTreeView tree={tree}
-                    onLeafClick={getJourneyReadings} />
+                    onLeafClick={getJourneyReadings}
+                    expansionPanelSummaryProps={{ style: { minHeight: 20, height: 25 } }}
+                    expansionPanelDetailsProps={{ style: { marginLeft: 15 } }}
+                />
             </Collapse>
         </List>
 
