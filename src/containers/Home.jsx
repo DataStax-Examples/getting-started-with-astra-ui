@@ -17,6 +17,9 @@ import Journeys from './Journeys';
 import TripContainer from './TripContainer';
 import AddJourneyDialog from './AddJourneyDialog';
 import logo from '../assets/logo-white.svg'
+import CredentialsDialog from './CredentialsDialog'
+import { amber, green } from '@material-ui/core/colors';
+import SnackbarContentWrapper from './SnackbarContentWrapper';
 
 const drawerWidth = 240;
 const pageSize = 25;
@@ -84,15 +87,27 @@ export default function Home() {
   const [open, setOpen] = React.useState(false);
   const [spacecraft, setSpacecraft] = React.useState([]);
   const [journeyReadings, setJourneyReadings] = React.useState({});
-  const [readingsPageStates, setReadingsPageStates] = React.useState({ temperature: "", pressure: "", location: "", speed: "" });
   const [openAddJourneyDialog, setOpenAddJourneyDialog] = React.useState(false);
+  const [openAddCreds, setOpenAddCreds] = React.useState(false);
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState(false);
+  const [snackbarClass, setSnackbarClass] = React.useState("info");
 
   //fetch the spacecraft
   React.useEffect(() => {
-    fetchJourneys();
+    checkCredentials();
   }, []);
+
+  const checkCredentials = async () => {
+    const result = await axios(
+      'https://localhost:5001/api/credentials',
+    ).then((res) => {
+      fetchJourneys();
+    }
+    ).catch((err) => {
+      setOpenAddCreds(true);
+    });
+  }
 
   const fetchJourneys = async () => {
     const result = await axios(
@@ -109,14 +124,18 @@ export default function Home() {
     setOpenAddJourneyDialog(!openAddJourneyDialog);
   }
 
+  const toggleAddCredsDialog = () => {
+    setOpenAddCreds(!openAddCreds);
+  }
 
   const toggleSnackbar = () => {
     setOpenSnackbar(!openSnackbar);
   };
 
-  const sendSnackbarMessage = (message) => {
+  const sendSnackbarMessage = (message, msgType) => {
     setSnackbarMessage(message);
     setOpenSnackbar(true);
+    setSnackbarClass(msgType || "info");
   }
 
   const fetchJourneyReadings = (spacecraftName, journeyId) => {
@@ -177,6 +196,42 @@ export default function Home() {
     fetchJourneys();
   }
 
+  const testNewCreds = async (pkg) => {
+    const result = await axios.post(
+      'https://localhost:5001/api/credentials/test?username=' + pkg.username + "&password=" + pkg.password + "&keyspace=" + pkg.keyspace,
+      pkg.secureConnectBundle,
+      {
+        headers: {
+          'Content-Type': 'text/plain'
+        }
+      }
+    ).then((res) => {
+      sendSnackbarMessage("Test Successful", "success");
+    }
+    ).catch((err) => {
+      sendSnackbarMessage(err.response.data, "error");
+    });
+  };
+
+  const addNewCreds = async (pkg) => {
+    const result = await axios.post(
+      'https://localhost:5001/api/credentials?username=' + pkg.username + "&password=" + pkg.password + "&keyspace=" + pkg.keyspace,
+      pkg.secureConnectBundle,
+      {
+        headers: {
+          'Content-Type': 'text/plain'
+        }
+      }
+    ).then((res) => {
+      sendSnackbarMessage("Test Successful", "success");
+      fetchJourneys();
+      toggleAddCredsDialog();
+    }
+    ).catch((err) => {
+      sendSnackbarMessage(err.response.data, "error");
+    });
+  };
+
 
   return (
     <div className={classes.root}>
@@ -225,7 +280,9 @@ export default function Home() {
         <Journeys onClose={toggleDrawer}
           onAddJourneyClick={toggleAddJourneyDialog}
           spacecraft={spacecraft}
-          fetchJourney={fetchJourneyReadings} />
+          fetchJourney={fetchJourneyReadings}
+          onAddCreds={toggleAddCredsDialog}
+        />
       </Drawer>
       <main
         className={clsx(classes.content, {
@@ -237,6 +294,7 @@ export default function Home() {
         <TripContainer data={journeyReadings} sendMessage={sendSnackbarMessage} />
       </main>
       <AddJourneyDialog open={openAddJourneyDialog} handleClose={toggleAddJourneyDialog} launchJourney={launchNewJourney} />
+      <CredentialsDialog open={openAddCreds} handleClose={toggleAddCredsDialog} handleTest={testNewCreds} handleSave={addNewCreds} />
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',
@@ -245,11 +303,13 @@ export default function Home() {
         open={openSnackbar}
         autoHideDuration={6000}
         onClose={toggleSnackbar}
-        ContentProps={{
-          'aria-describedby': 'message-id',
-        }}
-        message={<span id="message-id">{snackbarMessage}</span>}
-      />
+      >
+        <SnackbarContentWrapper
+          onClose={toggleSnackbar}
+          variant={snackbarClass}
+          message={snackbarMessage}
+        />
+      </Snackbar>
     </div>
   );
 }

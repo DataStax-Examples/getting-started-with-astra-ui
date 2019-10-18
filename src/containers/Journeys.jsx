@@ -51,6 +51,10 @@ export default function Journeys(props) {
             component="nav"
             className={classes.root}
         >
+            <ListItem button onClick={props.onAddCreds}>
+                <AddCircleOutlineIcon style={{ paddingRight: 5 }} />
+                <ListItemText primary="Set Creds" />
+            </ListItem>
             <ListItem button onClick={props.onAddJourneyClick}>
                 <AddCircleOutlineIcon style={{ paddingRight: 5 }} />
                 <ListItemText primary="Add a Journey" />
