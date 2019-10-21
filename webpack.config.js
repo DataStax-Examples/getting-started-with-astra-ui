@@ -1,6 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
+const dotenv = require('dotenv');
+
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -13,6 +15,14 @@ const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
 const DefinePluginConfig = new webpack.DefinePlugin({
   'process.env.NODE_ENV': JSON.stringify('production'),
 });
+
+const env = dotenv.config().parsed;
+
+// reduce it to a nice object, the same as before
+const envKeys = Object.keys(env).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(env[next]);
+  return prev;
+}, {});
 
 module.exports = {
   devServer: {
@@ -52,12 +62,16 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx'],
   },
+  node: {
+    fs: "empty"
+  },
   output: {
     filename: 'index.js',
     path: path.join(__dirname, '/build'),
   },
   mode: dev ? 'development' : 'production',
   plugins: dev
-    ? [HTMLWebpackPluginConfig, new webpack.HotModuleReplacementPlugin()]
-    : [HTMLWebpackPluginConfig, DefinePluginConfig],
+    ? [HTMLWebpackPluginConfig, new webpack.HotModuleReplacementPlugin(), new webpack.DefinePlugin(envKeys)]
+    : [HTMLWebpackPluginConfig, DefinePluginConfig,
+      new webpack.DefinePlugin(envKeys)],
 };

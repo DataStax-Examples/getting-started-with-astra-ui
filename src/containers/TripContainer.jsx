@@ -30,7 +30,11 @@ const useStyles = makeStyles(theme => ({
         padding: theme.spacing(2),
         height: 200,
         border: "solid 1px #585858",
-        backgroundColor: "black"
+        backgroundColor: "black",
+        '& canvas': {
+            height: 200,
+            width: "100%"
+        }
     }
 }));
 
@@ -216,7 +220,7 @@ export default function TripContainer(props) {
 
                 <Grid item xs>
                     <div className={classes.gauge} style={{ border: "none", marginTop: -15 }}>
-                        <Scatter data={locationData} options={optionsCustom} legend={{ display: false }} />
+                        <Scatter data={locationData} options={optionsCustom} legend={{ display: false }} height={200} />
                     </div>
                 </Grid>
                 <Grid item xs={12}>

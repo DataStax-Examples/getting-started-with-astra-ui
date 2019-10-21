@@ -1,4 +1,5 @@
 import React from 'react';
+require('dotenv').config()
 import clsx from 'clsx';
 import axios from 'axios';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -18,13 +19,13 @@ import TripContainer from './TripContainer';
 import AddJourneyDialog from './AddJourneyDialog';
 import logo from '../assets/logo-white.svg'
 import CredentialsDialog from './CredentialsDialog'
-import { amber, green } from '@material-ui/core/colors';
 import SnackbarContentWrapper from './SnackbarContentWrapper';
 import LaunchDialog from './LaunchDialog';
 
 const drawerWidth = 240;
 const pageSize = 25;
 const writeBatchSize = 100;
+const baseAddress = process.env.BASE_ADDRESS;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -106,7 +107,7 @@ export default function Home() {
 
   const checkCredentials = async () => {
     const result = await axios(
-      'https://localhost:5001/api/credentials',
+      baseAddress + '/credentials',
     ).then((res) => {
       fetchJourneys();
     }
@@ -117,7 +118,7 @@ export default function Home() {
 
   const fetchJourneys = async () => {
     const result = await axios(
-      'https://localhost:5001/api/spacecraft',
+      baseAddress + '/spacecraft',
     );
     setSpacecraft(result.data);
   }
@@ -158,10 +159,10 @@ export default function Home() {
   const fetchJourneyReadings = (spacecraftName, journeyId) => {
     async function fetchData(readingsPageStates, readings) {
       axios.all([
-        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/temperature?pagesize=' + pageSize + readingsPageStates.temperature),
-        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/pressure?pagesize=' + pageSize + readingsPageStates.pressure),
-        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/location?pagesize=' + pageSize + readingsPageStates.location),
-        axios.get('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/speed?pagesize=' + pageSize + readingsPageStates.speed)
+        axios.get(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/temperature?pagesize=' + pageSize + readingsPageStates.temperature),
+        axios.get(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/pressure?pagesize=' + pageSize + readingsPageStates.pressure),
+        axios.get(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/location?pagesize=' + pageSize + readingsPageStates.location),
+        axios.get(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/speed?pagesize=' + pageSize + readingsPageStates.speed)
       ]).then(responseArr => {
         //Concatenate all the results to the existing array
         readings.temperature.push(...responseArr[0].data.data);
@@ -202,10 +203,10 @@ export default function Home() {
   const sendJourneyReadings = async (index, spacecraftName, journeyId, temperature, pressure, speed, location) => {
     if (index < 1000) {
       axios.all([
-        axios.post('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/temperature', temperature.slice(index, writeBatchSize + index)),
-        axios.post('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/pressure', pressure.slice(index, writeBatchSize + index)),
-        axios.post('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/location', location.slice(index, writeBatchSize + index)),
-        axios.post('https://localhost:5001/api/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/speed', speed.slice(index, writeBatchSize + index))
+        axios.post(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/temperature', temperature.slice(index, writeBatchSize + index)),
+        axios.post(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/pressure', pressure.slice(index, writeBatchSize + index)),
+        axios.post(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/location', location.slice(index, writeBatchSize + index)),
+        axios.post(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/speed', speed.slice(index, writeBatchSize + index))
       ]).then(responseArr => {
         setCurrentWriteMessage("Writing records " + index + " of " + temperature.length);
         sendJourneyReadings(index + writeBatchSize, spacecraftName, journeyId, temperature, pressure, speed, location)
@@ -222,7 +223,7 @@ export default function Home() {
   const launchNewJourney = async (spacecraftName, summary) => {
     setOpenLaunchDialog(true);
     const result = await axios.post(
-      'https://localhost:5001/api/spacecraft/' + spacecraftName,
+      baseAddress + '/spacecraft/' + spacecraftName,
       JSON.stringify(summary || ""),
       {
         headers: {
@@ -285,7 +286,7 @@ export default function Home() {
 
   const testNewCreds = async (pkg) => {
     const result = await axios.post(
-      'https://localhost:5001/api/credentials/test?username=' + pkg.username + "&password=" + pkg.password + "&keyspace=" + pkg.keyspace,
+      baseAddress + '/credentials/test?username=' + pkg.username + "&password=" + pkg.password + "&keyspace=" + pkg.keyspace,
       pkg.secureConnectBundle,
       {
         headers: {
@@ -302,7 +303,7 @@ export default function Home() {
 
   const addNewCreds = async (pkg) => {
     const result = await axios.post(
-      'https://localhost:5001/api/credentials?username=' + pkg.username + "&password=" + pkg.password + "&keyspace=" + pkg.keyspace,
+      baseAddress + '/credentials?username=' + pkg.username + "&password=" + pkg.password + "&keyspace=" + pkg.keyspace,
       pkg.secureConnectBundle,
       {
         headers: {
