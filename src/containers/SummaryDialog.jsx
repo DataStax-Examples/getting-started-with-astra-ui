@@ -62,7 +62,7 @@ export default function SummaryDialog(props) {
                             className={classes.root}
                         >
                             <ListItem className={classes.nopadding}>
-                                <ListItemText primary={<span>Spacecraft Name: <strong>props.journeyInformation.spacecraft_name</strong></span>} />
+                                <ListItemText primary={<span>Spacecraft Name: <strong>{props.journeyInformation.spacecraft_name}</strong></span>} />
                             </ListItem>
                             <ListItem className={classes.nopadding}>
                                 <ListItemText primary={<span>Journey ID: <strong>{props.journeyInformation.journey_id}</strong></span>} />

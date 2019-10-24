@@ -50,7 +50,7 @@ export default function TripContainer(props) {
         location: { x_coordinate: 0, y_coordinate: 0, z_coordinate: 0 },
         index: 0
     });
-    const [currentInterval, setCurrentInterval] = useState(5);
+    const [currentInterval, setCurrentInterval] = useState(50);
     const [data, setData] = useState(props.data);
     const [openSummaryDialog, setOpenSummaryDialog] = useState(false);
 
