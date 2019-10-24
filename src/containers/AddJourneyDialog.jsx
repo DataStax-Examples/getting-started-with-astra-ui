@@ -32,6 +32,15 @@ export default function AddJourneyDialog(props) {
                 <DialogTitle id="form-dialog-title">Launch a Spacecraft</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
+                        What happens when we launch a journey:
+                    <ol>
+                            <li>A new journey is created for the spacecraft</li>
+                            <li>One thousand sensor readings are generated for speed, pressure, temperature, and location</li>
+                            <li>These sensor readings are saved to the Apollo tables one hundred at a time</li>
+                            <li>The sensor readings are read back from Apollo twenty five at a time</li>
+                            <li>The readings are displayed with it being updated every fifty milliseconds</li>
+                            <li>Once the journey is complete a summary tells you how quickly the data was written and read from the client</li>
+                        </ol>
                         Enter the details below and press "Launch " to create a new journey:
                     </DialogContentText>
                     <TextField
@@ -53,6 +62,7 @@ export default function AddJourneyDialog(props) {
                         fullWidth
                         onChange={updateSummary}
                     />
+
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={props.handleClose} color="primary">

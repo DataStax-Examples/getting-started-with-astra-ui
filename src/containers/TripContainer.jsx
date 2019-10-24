@@ -228,7 +228,7 @@ export default function TripContainer(props) {
                         >
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Cassandra Table</TableCell>
+                                    <TableCell>Apollo Table</TableCell>
                                     <TableCell align="right">Rows Written</TableCell>
                                     <TableCell align="right">Rows Read</TableCell>
                                     <TableCell align="right">Current Row Displayed</TableCell>
@@ -285,7 +285,7 @@ export default function TripContainer(props) {
                             />
 
                         </div>
-                        Cassandra Table: spacecraft_temperature_over_time
+                        Apollo Table: spacecraft_temperature_over_time
                     </div>
                 </Grid>
                 <Grid item xs={3}>
@@ -302,7 +302,7 @@ export default function TripContainer(props) {
                                 }}
                             />
                         </div>
-                        Cassandra Table: spacecraft_speed_over_time
+                        Apollo Table: spacecraft_speed_over_time
                     </div>
                 </Grid>
                 <Grid item xs={3}>
@@ -316,7 +316,7 @@ export default function TripContainer(props) {
                                 segmentColors={['green', 'limegreen', 'yellow', 'orange', 'red']}
                             />
                         </div>
-                        Cassandra Table: spacecraft_pressure_over_time
+                        Apollo Table: spacecraft_pressure_over_time
                     </div>
                 </Grid>
                 <Grid item xs={3}>
@@ -326,7 +326,7 @@ export default function TripContainer(props) {
                                 <Scatter data={locationData} options={optionsCustom} legend={{ display: false }} height={200} />
                             </div>
                         </div>
-                        Cassandra Table: spacecraft_location_over_time
+                        Apollo Table: spacecraft_location_over_time
                     </div>
                 </Grid>
             </Grid>

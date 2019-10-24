@@ -235,13 +235,15 @@ export default function Home() {
         axios.post(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/speed', speed.slice(index, writeBatchSize + index))
       ]).then(responseArr => {
         setCurrentWriteCount(index);
+        if (index === (writeBatchSize * 4)) {
+          fetchJourneyReadings(spacecraftName, journeyId);
+        }
         sendJourneyReadings(index + writeBatchSize, spacecraftName, journeyId, temperature, pressure, speed, location, startDate)
       });
     } else {
       var endDate = Date.now();
       var timeSpent = (endDate - startDate);
       setJourneyWriteTime(timeSpent);
-      fetchJourneyReadings(spacecraftName, journeyId);
       setCurrentWriteCount(index);
       setCurrentWriteTime(timeSpent);
     }
@@ -451,8 +453,8 @@ export default function Home() {
           journeyInformation={{
             spacecraft_name: currentJourney.spacecraft_name,
             journey_id: currentJourney.journey_id,
-            read_time: journeyReadTime,
-            write_time: journeyWriteTime,
+            read_time: currentReadTime,
+            write_time: currentWriteTime,
           }}
         />
       </main>
