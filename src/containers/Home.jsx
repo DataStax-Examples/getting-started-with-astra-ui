@@ -107,7 +107,6 @@ export default function Home() {
   const [journeyWriteTime, setJourneyWriteTime] = React.useState(null);
   const [currentJourney, setCurrentJourney] = React.useState({ spacecraft_name: "", journey_id: "" });
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [username, setUserName] = React.useState("");
 
   //fetch the spacecraft
   React.useEffect(() => {
@@ -235,20 +234,18 @@ export default function Home() {
       ]).then(responseArr => {
         setCurrentWriteMessage("Writing records " + index + " of " + temperature.length);
         sendJourneyReadings(index + writeBatchSize, spacecraftName, journeyId, temperature, pressure, speed, location, startDate)
-
-        if (index === writeBatchSize * 4) {
-          fetchJourneyReadings(spacecraftName, journeyId);
-        }
       });
     } else {
       var endDate = Date.now();
       var timeSpent = (endDate - startDate);
       setJourneyWriteTime(timeSpent);
+      fetchJourneyReadings(spacecraftName, journeyId);
       setCurrentWriteMessage("All rows have been written for this launch in " + (timeSpent / 1000).toFixed(0) + " seconds.");
     }
   }
 
   const launchNewJourney = async (spacecraftName, summary) => {
+    setIsPlaying(false);
     setOpenLaunchDialog(true);
     const result = await axios.post(
       baseAddress + '/spacecraft/' + spacecraftName,
@@ -334,7 +331,6 @@ export default function Home() {
       formData
     ).then((res) => {
       sendSnackbarMessage("Database Credentials Saved", "success");
-      setUserName(pkg.username);
       fetchJourneys();
       toggleAddCredsDialog();
     }
@@ -378,7 +374,7 @@ export default function Home() {
             Getting Started with Apollo
           </Typography>
 
-          <Button variant="contained" className={classes.button} onClick={toggleAddJourneyDialog} disabled={isPlaying}
+          <Button variant="contained" className={classes.button} onClick={toggleAddJourneyDialog}
             style={{ marginLeft: "auto", marginRight: "auto" }}>
             Launch New Journey
           </Button>
@@ -392,8 +388,6 @@ export default function Home() {
               color="inherit"
             >
               <AccountCircle />
-
-              <span style={{ paddingLeft: 5 }}>{username}</span>
             </IconButton>
             <Menu
               id="menu-appbar"

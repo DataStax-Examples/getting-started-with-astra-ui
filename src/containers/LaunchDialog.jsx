@@ -11,8 +11,7 @@ export default function LaunchDialog(props) {
         "T-4 - We read you 5 by 5",
         "T-3 - Main Engine Start",
         "T-2",
-        "T-1",
-        "Liftoff"
+        "T-1 - Liftoff"
     ]
     useInterval(() => {
         if (props.open) {

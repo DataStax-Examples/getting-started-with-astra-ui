@@ -20,6 +20,18 @@ const useStyles = makeStyles(theme => ({
     },
     nested: {
         paddingLeft: theme.spacing(2),
+        width: '100%',
+        marginTop: 2,
+        marginBottom: 2,
+        '& li': {
+            marginTop: 2,
+            marginBottom: 2,
+            listStyle: "none"
+        }
+    },
+    nopadding: {
+        paddingTop: 0,
+        paddingBottom: 0
     },
     closeButton: {
         position: 'absolute',
@@ -49,42 +61,43 @@ export default function SummaryDialog(props) {
                             component="nav"
                             className={classes.root}
                         >
-                            <ListItem>
-                                <ListItemText primary={"Spacecraft Name: " + props.journeyInformation.spacecraft_name} />
+                            <ListItem className={classes.nopadding}>
+                                <ListItemText primary={<span>Spacecraft Name: <strong>props.journeyInformation.spacecraft_name</strong></span>} />
                             </ListItem>
-                            <ListItem>
-                                <ListItemText primary={"Journey ID: " + props.journeyInformation.journey_id} />
+                            <ListItem className={classes.nopadding}>
+                                <ListItemText primary={<span>Journey ID: <strong>{props.journeyInformation.journey_id}</strong></span>} />
                             </ListItem>
-                            <ListItem>
-                                <ListItemText primary={"Read Duration: " + (props.journeyInformation.read_time / 1000).toFixed(2) + " seconds"} />
+                            <ListItem className={classes.nopadding}>
+                                <ListItemText primary={<span>Read Duration: <strong>{(props.journeyInformation.read_time / 1000).toFixed(2)}</strong> seconds</span>} />
                             </ListItem>
-                            {props.journeyInformation.writeTime && props.journeyInformation.writeTime > 0 &&
-                                <ListItem>
-                                    <ListItemText primary={"Write Duration: " + (props.journeyInformation.write_time / 1000).toFixed(2) + " seconds"} />
+                            {props.journeyInformation.write_time && props.journeyInformation.write_time > 0 &&
+                                <ListItem className={classes.nopadding}>
+                                    <ListItemText primary={<span>Write Duration: <strong>{(props.journeyInformation.write_time / 1000).toFixed(2)}</strong> seconds</span>} />
                                 </ListItem>
                             }
-                            <ListItem>
-                                <ListItemText primary="Database Tables Accessed" />
+                            <ListItem className={classes.nopadding}>
+                                <ListItemText primary="Database Tables Accessed"
+
+                                    secondary={
+                                        <ul className={classes.nested}>
+                                            <li>spacecraft_journey_catalog: <strong>1</strong> row effected</li>
+                                            <li>spacecraft_speed_over_time: <strong>1000</strong> row effected</li>
+                                            <li>spacecraft_location_over_time: <strong>1000</strong> rows effected</li>
+                                            <li>spacecraft_temperature_over_time: <strong>1000</strong> rows effected</li>
+                                            <li>spacecraft_pressure_over_time: <strong>1000</strong> rows effected</li>
+                                        </ul>
+                                    } />
                             </ListItem>
-                            <div className={classes.nested}>
-                                <List component="div" disablePadding dense>
-                                    <ListItem>
-                                        <ListItemText primary="spacecraft_journey_catalog: 1 row effected" />
-                                    </ListItem>
-                                    <ListItem>
-                                        <ListItemText primary="spacecraft_speed_over_time: 1000 row effected" />
-                                    </ListItem>
-                                    <ListItem>
-                                        <ListItemText primary="spacecraft_location_over_time: 1000 rows effected" />
-                                    </ListItem>
-                                    <ListItem>
-                                        <ListItemText primary="spacecraft_temperature_over_time: 1000 rows effected" />
-                                    </ListItem>
-                                    <ListItem>
-                                        <ListItemText primary="spacecraft_pressure_over_time: 1000 rows effected" />
-                                    </ListItem>
-                                </List>
-                            </div>
+                            <ListItem className={classes.nopadding}>
+                                <ListItemText primary="To Learn More"
+                                    secondary={
+                                        <ul className={classes.nested}>
+                                            <li>To <strong>learn</strong> from the experts, start your <a href="www.datastax.com">DataStax Academy learning path</a>.</li>
+                                            <li>To <strong>see</strong> the code for this example, go to the <a href="www.datastax.com">source code</a>.</li>
+                                            <li>To <strong>read</strong> about Apollo details and tooling, go to the <a href="www.datastax.com">documentation</a>.</li>
+                                        </ul>
+                                    } />
+                            </ListItem>
                         </List>
                         <div style={{ display: "flex" }}>
                             <Button variant="contained" onClick={props.handleClose} color="primary" style={{ marginLeft: "auto", marginRight: "auto" }}>
@@ -94,6 +107,6 @@ export default function SummaryDialog(props) {
                     </DialogContentText>
                 </DialogContent>
             </Dialog>
-        </div>
+        </div >
     )
 };

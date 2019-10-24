@@ -65,28 +65,23 @@ export default function TripContainer(props) {
         })
     }, [props.playing])
 
-    function toggleSummaryDialog() {
-        setOpenSummaryDialog(!openSummaryDialog);
+    function closeSummaryDialog() {
+        setOpenSummaryDialog(false);
     }
 
     useInterval(() => {
-        if (props.playing && data.temperature
-            && currentValues.index < data.temperature.length
-            && currentValues.index < data.pressure.length
-            && currentValues.index < data.speed.length) {
-            var newIndex = currentValues.index + 1;
-            setCurrentValues({
-                temperature: data.temperature[currentValues.index].temperature.toPrecision(4),
-                pressure: data.pressure[currentValues.index].pressure.toPrecision(4),
-                speed: data.speed[currentValues.index].speed.toPrecision(7),
-                location: data.location[currentValues.index].location,
-                index: newIndex
-            });
-            if (newIndex === data.temperature.length - 1) {
+        if (props.playing && data && data.temperature) {
+            if (data.temperature && currentValues.index < 999) {    //We are ready so ley's play the replay
+                var newIndex = currentValues.index + 1;
+                setCurrentValues({
+                    temperature: data.temperature[currentValues.index].temperature.toPrecision(4),
+                    pressure: data.pressure[currentValues.index].pressure.toPrecision(4),
+                    speed: data.speed[currentValues.index].speed.toPrecision(7),
+                    location: data.location[currentValues.index].location,
+                    index: newIndex
+                });
+            } else {    //we are done running so stop playing and show the summary
                 setOpenSummaryDialog(true);
-            }
-        } else {
-            if (props.playing) {
                 props.stopPlaying();
             }
         }
@@ -247,7 +242,7 @@ export default function TripContainer(props) {
                     </Paper>
                 </Grid>
             </Grid>
-            <SummaryDialog open={openSummaryDialog} handleClose={toggleSummaryDialog} journeyInformation={props.journeyInformation} />
+            <SummaryDialog open={openSummaryDialog} handleClose={closeSummaryDialog} journeyInformation={props.journeyInformation} />
         </div>
     );
 }
