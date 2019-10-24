@@ -99,8 +99,10 @@ export default function Home() {
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState(false);
   const [snackbarClass, setSnackbarClass] = React.useState("info");
-  const [currentReadMessage, setCurrentReadMessage] = React.useState("Waiting for next launch");
-  const [currentWriteMessage, setCurrentWriteMessage] = React.useState("Waiting for next launch");
+  const [currentReadCount, setCurrentReadCount] = React.useState(0);
+  const [currentReadTime, setCurrentReadTime] = React.useState(0);
+  const [currentWriteCount, setCurrentWriteCount] = React.useState(0);
+  const [currentWriteTime, setCurrentWriteTime] = React.useState(0);
   const [openLaunchDialog, setOpenLaunchDialog] = React.useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [journeyReadTime, setJourneyReadTime] = React.useState(null);
@@ -199,12 +201,12 @@ export default function Home() {
           {
             setIsPlaying(true);
           }
-          setCurrentReadMessage("Reading rows " + readings.temperature.length);
+          setCurrentReadCount(readings.temperature.length);
         } else {
           var endDate = Date.now();
           var timeSpent = (endDate - startDate);
           setJourneyReadTime(timeSpent);
-          setCurrentReadMessage("All rows read for this launch in " + (timeSpent / 1000).toFixed(0) + " seconds.");
+          setCurrentReadTime(timeSpent);
         }
       });
     }
@@ -232,7 +234,7 @@ export default function Home() {
         axios.post(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/location', location.slice(index, writeBatchSize + index)),
         axios.post(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/speed', speed.slice(index, writeBatchSize + index))
       ]).then(responseArr => {
-        setCurrentWriteMessage("Writing records " + index + " of " + temperature.length);
+        setCurrentWriteCount(index);
         sendJourneyReadings(index + writeBatchSize, spacecraftName, journeyId, temperature, pressure, speed, location, startDate)
       });
     } else {
@@ -240,7 +242,8 @@ export default function Home() {
       var timeSpent = (endDate - startDate);
       setJourneyWriteTime(timeSpent);
       fetchJourneyReadings(spacecraftName, journeyId);
-      setCurrentWriteMessage("All rows have been written for this launch in " + (timeSpent / 1000).toFixed(0) + " seconds.");
+      setCurrentWriteCount(index);
+      setCurrentWriteTime(timeSpent);
     }
   }
 
@@ -439,8 +442,10 @@ export default function Home() {
         <TripContainer
           data={journeyReadings}
           sendMessage={sendSnackbarMessage}
-          currentWriteMessage={currentWriteMessage}
-          currentReadMessage={currentReadMessage}
+          currentReadCount={currentReadCount}
+          currentReadTime={currentReadTime}
+          currentWriteCount={currentWriteCount}
+          currentWriteTime={currentWriteTime}
           playing={isPlaying}
           stopPlaying={togglePlayback}
           journeyInformation={{

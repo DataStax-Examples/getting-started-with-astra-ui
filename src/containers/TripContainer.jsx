@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import ReactSpeedometer from "react-d3-speedometer";
 import { Scatter } from 'react-chartjs-2';
 import SummaryDialog from './SummaryDialog';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -21,15 +25,38 @@ const useStyles = makeStyles(theme => ({
         zIndex: 100,
         bottom: 0
     },
-    paper: {
-        padding: theme.spacing(2),
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
+    tableContainer: {
+        backgroundColor: 'black !important',
+    },
+    table: {
+        zIndex: 100,
+        backgroundColor: "black",
+        border: "solid 1px #585858",
+        width: 650,
+        '& th': {
+            color: 'limegreen',
+            backgroundColor: "black",
+            fontWeight: "bold",
+            borderBottomColor: 'limegreen',
+            paddingTop: 0,
+            paddingBottom: 0
+        },
+        '& td': {
+            color: 'limegreen',
+            backgroundColor: "black",
+            borderBottomColor: 'limegreen',
+            paddingTop: 0,
+            paddingBottom: 0
+        }
+    },
+    gaugeContainer: {
+        border: "solid 1px #585858",
+        backgroundColor: "black",
+        color: 'limegreen',
     },
     gauge: {
         padding: theme.spacing(2),
         height: 200,
-        border: "solid 1px #585858",
         backgroundColor: "black",
         '& canvas': {
             height: 200,
@@ -181,68 +208,129 @@ export default function TripContainer(props) {
     return (
         <div className={classes.root}>
             {props.playing &&
-                <div className="stars"></div>
+                <div className="stars">
+                </div>
+            }
+            {props.playing &&
+                <Grid
+                    container
+                    spacing={0}
+                    direction="column"
+                    alignItems="center"
+                    justify="center"
+                    style={{ minHeight: '100vh' }}
+                    className={classes.tableContainer}
+                >
+
+                    <Grid item xs={12}>
+                        <Table className={classes.table} aria-label="simple table"
+                            dense
+                        >
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Cassandra Table</TableCell>
+                                    <TableCell align="right">Rows Written</TableCell>
+                                    <TableCell align="right">Rows Read</TableCell>
+                                    <TableCell align="right">Current Row Displayed</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow key="spacecraft_temperature_over_time">
+                                    <TableCell component="th" scope="row">
+                                        spacecraft_temperature_over_time
+                                    </TableCell>
+                                    <TableCell align="right">{props.currentWriteCount}</TableCell>
+                                    <TableCell align="right">{props.currentReadCount}</TableCell>
+                                    <TableCell align="right">{currentValues.index}</TableCell>
+                                </TableRow>
+                                <TableRow key="spacecraft_speed_over_time">
+                                    <TableCell component="th" scope="row">
+                                        spacecraft_speed_over_time
+                                    </TableCell>
+                                    <TableCell align="right">{props.currentWriteCount}</TableCell>
+                                    <TableCell align="right">{props.currentReadCount}</TableCell>
+                                    <TableCell align="right">{currentValues.index}</TableCell>
+                                </TableRow>
+                                <TableRow key="spacecraft_pressure_over_time">
+                                    <TableCell component="th" scope="row">
+                                        spacecraft_pressure_over_time
+                                    </TableCell>
+                                    <TableCell align="right">{props.currentWriteCount}</TableCell>
+                                    <TableCell align="right">{props.currentReadCount}</TableCell>
+                                    <TableCell align="right">{currentValues.index}</TableCell>
+                                </TableRow>
+                                <TableRow key="spacecraft_location_over_time">
+                                    <TableCell component="th" scope="row">
+                                        spacecraft_location_over_time
+                                    </TableCell>
+                                    <TableCell align="right">{props.currentWriteCount}</TableCell>
+                                    <TableCell align="right">{props.currentReadCount}</TableCell>
+                                    <TableCell align="right">{currentValues.index}</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </Grid>
+                </Grid>
             }
             <Grid container spacing={3} className={classes.grid}>
                 <Grid item xs={3}>
-                    <div className={classes.gauge}>
-                        <ReactSpeedometer
-                            minValue={temperatureGauge.min}
-                            maxValue={temperatureGauge.max}
-                            value={currentValues.temperature}
-                            currentValueText={"Temperature: ${value} " + temperatureGauge.units}
-                            segmentColors={['green', 'limegreen', 'yellow', 'orange', 'red']}
-                        />
-                    </div>
-                </Grid>
-                <Grid item xs={3}>
-                    <div className={classes.gauge}>
-                        <ReactSpeedometer
-                            minValue={speedGauge.min}
-                            maxValue={speedGauge.max}
-                            value={currentValues.speed}
-                            currentValueText={"Speed: ${value} " + speedGauge.units}
-                            segmentColors={['green', 'limegreen', 'yellow', 'orange', 'red']}
-                            style={{
-                                border: "solid 1px red"
-                            }}
-                        />
-                    </div>
-                </Grid>
-                <Grid item xs={3}>
-                    <div className={classes.gauge}>
-                        <ReactSpeedometer
-                            minValue={pressureGauge.min}
-                            maxValue={pressureGauge.max}
-                            value={currentValues.pressure}
-                            currentValueText={"Pressure: ${value} " + pressureGauge.units}
-                            segmentColors={['green', 'limegreen', 'yellow', 'orange', 'red']}
-                        />
-                    </div>
-                </Grid>
+                    <div className={classes.gaugeContainer}>
+                        <div className={classes.gauge}>
+                            <ReactSpeedometer
+                                minValue={temperatureGauge.min}
+                                maxValue={temperatureGauge.max}
+                                value={currentValues.temperature}
+                                currentValueText={"Temperature: ${value} " + temperatureGauge.units}
+                                segmentColors={['green', 'limegreen', 'yellow', 'orange', 'red']}
+                            />
 
-                <Grid item xs={3}>
-                    <div className={classes.gauge} style={{ border: "none", marginTop: -15 }}>
-                        <Scatter data={locationData} options={optionsCustom} legend={{ display: false }} height={200} />
+                        </div>
+                        Cassandra Table: spacecraft_temperature_over_time
                     </div>
                 </Grid>
-                <Grid item xs>
-                    <Paper className={classes.paper}>
-                        {props.currentWriteMessage}
-                    </Paper>
+                <Grid item xs={3}>
+                    <div className={classes.gaugeContainer}>
+                        <div className={classes.gauge}>
+                            <ReactSpeedometer
+                                minValue={speedGauge.min}
+                                maxValue={speedGauge.max}
+                                value={currentValues.speed}
+                                currentValueText={"Speed: ${value} " + speedGauge.units}
+                                segmentColors={['green', 'limegreen', 'yellow', 'orange', 'red']}
+                                style={{
+                                    border: "solid 1px red"
+                                }}
+                            />
+                        </div>
+                        Cassandra Table: spacecraft_speed_over_time
+                    </div>
                 </Grid>
-                <Grid item xs>
-                    <Paper className={classes.paper}>
-                        {props.currentReadMessage}
-                    </Paper>
+                <Grid item xs={3}>
+                    <div className={classes.gaugeContainer}>
+                        <div className={classes.gauge}>
+                            <ReactSpeedometer
+                                minValue={pressureGauge.min}
+                                maxValue={pressureGauge.max}
+                                value={currentValues.pressure}
+                                currentValueText={"Pressure: ${value} " + pressureGauge.units}
+                                segmentColors={['green', 'limegreen', 'yellow', 'orange', 'red']}
+                            />
+                        </div>
+                        Cassandra Table: spacecraft_pressure_over_time
+                    </div>
                 </Grid>
-                <Grid item xs>
-                    <Paper className={classes.paper}>
-                        Currently Displaying Index: {currentValues.index}
-                    </Paper>
+                <Grid item xs={3}>
+                    <div className={classes.gaugeContainer}>
+                        <div className={classes.gauge}>
+                            <div style={{ border: "none", marginTop: -15 }}>
+                                <Scatter data={locationData} options={optionsCustom} legend={{ display: false }} height={200} />
+                            </div>
+                        </div>
+                        Cassandra Table: spacecraft_location_over_time
+                    </div>
                 </Grid>
             </Grid>
             <SummaryDialog open={openSummaryDialog} handleClose={closeSummaryDialog} journeyInformation={props.journeyInformation} />
-        </div>
+        </div >
     );
 }
