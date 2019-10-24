@@ -52,12 +52,6 @@ export default function Journeys(props) {
             className={classes.root}
             dense
         >
-            <ListItem button onClick={props.onAddCreds}>
-                <ListItemText primary="Set Credentials" />
-            </ListItem>
-            <ListItem button onClick={props.onAddJourneyClick}>
-                <ListItemText primary="Launch a Journey" />
-            </ListItem>
             <ListItem button onClick={handleClick}>
                 <ListItemText primary={"Replay Journey"} />
                 {open ? <ExpandLess /> : <ExpandMore />}

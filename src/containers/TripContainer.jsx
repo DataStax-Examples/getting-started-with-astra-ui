@@ -3,8 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import ReactSpeedometer from "react-d3-speedometer";
-import Button from '@material-ui/core/Button';
 import { Scatter } from 'react-chartjs-2';
+import SummaryDialog from './SummaryDialog';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -50,21 +50,27 @@ export default function TripContainer(props) {
         location: { x_coordinate: 0, y_coordinate: 0, z_coordinate: 0 },
         index: 0
     });
-    const [currentInterval, setCurrentInterval] = useState(100);
-    const [isPlaying, setIsPlaying] = useState(false);
+    const [currentInterval, setCurrentInterval] = useState(5);
     const [data, setData] = useState(props.data);
+    const [openSummaryDialog, setOpenSummaryDialog] = useState(false);
 
-    function togglePlayback() {
-        setCurrentValues({ temperature: null, pressure: null, speed: null, index: 0 });
-        setIsPlaying(!isPlaying);
+    ///Reset the current playing state when it is finished
+    useEffect(() => {
+        setCurrentValues({
+            temperature: null,
+            pressure: null,
+            speed: null,
+            location: { x_coordinate: 0, y_coordinate: 0, z_coordinate: 0 },
+            index: 0
+        })
+    }, [props.playing])
+
+    function toggleSummaryDialog() {
+        setOpenSummaryDialog(!openSummaryDialog);
     }
 
-    useEffect(() => {
-        setIsPlaying(props.autoPlay);
-    }, [props.autoPlay])
-
     useInterval(() => {
-        if (isPlaying && data.temperature
+        if (props.playing && data.temperature
             && currentValues.index < data.temperature.length
             && currentValues.index < data.pressure.length
             && currentValues.index < data.speed.length) {
@@ -77,10 +83,12 @@ export default function TripContainer(props) {
                 index: newIndex
             });
             if (newIndex === data.temperature.length - 1) {
-                props.sendMessage("Your Journey is Complete")
+                setOpenSummaryDialog(true);
             }
         } else {
-            setIsPlaying(false);
+            if (props.playing) {
+                props.stopPlaying();
+            }
         }
     }, currentInterval);
 
@@ -177,11 +185,11 @@ export default function TripContainer(props) {
 
     return (
         <div className={classes.root}>
-            {isPlaying &&
+            {props.playing &&
                 <div className="stars"></div>
             }
             <Grid container spacing={3} className={classes.grid}>
-                <Grid item xs>
+                <Grid item xs={3}>
                     <div className={classes.gauge}>
                         <ReactSpeedometer
                             minValue={temperatureGauge.min}
@@ -192,7 +200,7 @@ export default function TripContainer(props) {
                         />
                     </div>
                 </Grid>
-                <Grid item xs>
+                <Grid item xs={3}>
                     <div className={classes.gauge}>
                         <ReactSpeedometer
                             minValue={speedGauge.min}
@@ -206,7 +214,7 @@ export default function TripContainer(props) {
                         />
                     </div>
                 </Grid>
-                <Grid item xs>
+                <Grid item xs={3}>
                     <div className={classes.gauge}>
                         <ReactSpeedometer
                             minValue={pressureGauge.min}
@@ -218,15 +226,10 @@ export default function TripContainer(props) {
                     </div>
                 </Grid>
 
-                <Grid item xs>
+                <Grid item xs={3}>
                     <div className={classes.gauge} style={{ border: "none", marginTop: -15 }}>
                         <Scatter data={locationData} options={optionsCustom} legend={{ display: false }} height={200} />
                     </div>
-                </Grid>
-                <Grid item xs={12}>
-                    <Button variant="contained" className={classes.button} onClick={togglePlayback} disabled={!props.data.temperature}>
-                        {isPlaying ? "Stop Playback" : "Start Playback"}
-                    </Button>
                 </Grid>
                 <Grid item xs>
                     <Paper className={classes.paper}>
@@ -244,6 +247,7 @@ export default function TripContainer(props) {
                     </Paper>
                 </Grid>
             </Grid>
+            <SummaryDialog open={openSummaryDialog} handleClose={toggleSummaryDialog} journeyInformation={props.journeyInformation} />
         </div>
     );
 }

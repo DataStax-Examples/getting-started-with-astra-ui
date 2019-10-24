@@ -8,9 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import TextField from '@material-ui/core/TextField';
 import { DropzoneArea } from 'material-ui-dropzone'
-import { file } from '@babel/types';
 
-const emails = ['username@gmail.com', 'user02@gmail.com'];
 const useStyles = makeStyles(theme => ({
     button: {
         margin: theme.spacing(1),
@@ -60,11 +58,11 @@ export default function CredentialsDialog(props) {
     }
 
     function testConnection() {
-        props.handleTest({ username: userName, password: password, keyspace: keyspace, secureConnectBundle: fileContent });
+        props.handleTest({ username: userName, password: password, keyspace: keyspace, secureConnectBundle: files[0] });
     }
 
     function saveConnection() {
-        props.handleSave({ username: userName, password: password, keyspace: keyspace, secureConnectBundle: fileContent });
+        props.handleSave({ username: userName, password: password, keyspace: keyspace, secureConnectBundle: files[0] });
     }
 
     const saveEnabled = password && userName && keyspace && files;
@@ -76,7 +74,7 @@ export default function CredentialsDialog(props) {
                 <DialogContent>
                     <DialogContentText>
                         Please enter the following information to connect to your Apollo instance
-          </DialogContentText>
+                    </DialogContentText>
                     <TextField
                         autoFocus
                         margin="dense"

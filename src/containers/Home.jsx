@@ -1,5 +1,4 @@
-import React from 'react';
-require('dotenv').config()
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import axios from 'axios';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -21,22 +20,28 @@ import logo from '../assets/logo-white.svg'
 import CredentialsDialog from './CredentialsDialog'
 import SnackbarContentWrapper from './SnackbarContentWrapper';
 import LaunchDialog from './LaunchDialog';
+import Button from '@material-ui/core/Button';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
 
 const drawerWidth = 240;
-const pageSize = 25;
+const pageSize = 100;
 const writeBatchSize = 100;
 const baseAddress = process.env.BASE_ADDRESS;
 
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
+    flexGrow: 1
   },
   appBar: {
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    backgroundColor: "#0C153A"
+    backgroundColor: "#0C153A",
+    zIndex: theme.zIndex.drawer + 1,
   },
   appBarShift: {
     width: `calc(100% - #{drawerWidth}px)`,
@@ -75,12 +80,11 @@ const useStyles = makeStyles(theme => ({
     }),
     marginLeft: -drawerWidth,
   },
-  contentShift: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  title: {
+    flexGrow: 1,
   },
 }));
 
@@ -98,15 +102,24 @@ export default function Home() {
   const [currentReadMessage, setCurrentReadMessage] = React.useState("Waiting for next launch");
   const [currentWriteMessage, setCurrentWriteMessage] = React.useState("Waiting for next launch");
   const [openLaunchDialog, setOpenLaunchDialog] = React.useState(false);
-  const [autoPlay, setAutoPlay] = React.useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [journeyReadTime, setJourneyReadTime] = React.useState(null);
+  const [journeyWriteTime, setJourneyWriteTime] = React.useState(null);
+  const [currentJourney, setCurrentJourney] = React.useState({ spacecraft_name: "", journey_id: "" });
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [username, setUserName] = React.useState("");
 
   //fetch the spacecraft
   React.useEffect(() => {
     checkCredentials();
   }, []);
 
+  function togglePlayback() {
+    setIsPlaying(!isPlaying);
+  }
+
   const checkCredentials = async () => {
-    const result = await axios(
+    await axios(
       baseAddress + '/credentials',
     ).then((res) => {
       fetchJourneys();
@@ -138,11 +151,14 @@ export default function Home() {
     if (!openAddCreds) {
       setOpen(false);
     }
+    if (anchorEl) {
+      setAnchorEl(null);
+    }
     setOpenAddCreds(!openAddCreds);
   }
 
   const toggleLaunchDialog = () => {
-    setAutoPlay(openLaunchDialog);
+    setIsPlaying(openLaunchDialog);
     setOpenLaunchDialog(!openLaunchDialog);
   }
 
@@ -157,7 +173,7 @@ export default function Home() {
   }
 
   const fetchJourneyReadings = (spacecraftName, journeyId) => {
-    async function fetchData(readingsPageStates, readings) {
+    async function fetchData(readingsPageStates, readings, startDate) {
       axios.all([
         axios.get(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/temperature?pagesize=' + pageSize + readingsPageStates.temperature),
         axios.get(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/pressure?pagesize=' + pageSize + readingsPageStates.pressure),
@@ -179,13 +195,22 @@ export default function Home() {
         };
         //If we are not at the end then fetch more data
         if (responseArr[0].data.data && responseArr[0].data.data.length > 0) {
-          fetchData(readingsPageStates, readings);
+          fetchData(readingsPageStates, readings, startDate);
+          if (readings.temperature.length && !isPlaying) //Auto start the replay
+          {
+            setIsPlaying(true);
+          }
           setCurrentReadMessage("Reading rows " + readings.temperature.length);
         } else {
-          setCurrentReadMessage("All rows read for this launch");
+          var endDate = Date.now();
+          var timeSpent = (endDate - startDate);
+          setJourneyReadTime(timeSpent);
+          setCurrentReadMessage("All rows read for this launch in " + (timeSpent / 1000).toFixed(0) + " seconds.");
         }
       });
     }
+    setCurrentJourney({ spacecraft_name: spacecraftName, journey_id: journeyId });
+    setJourneyReadTime(null);
     fetchData({
       temperature: "",
       pressure: "",
@@ -197,10 +222,10 @@ export default function Home() {
         pressure: [],
         location: [],
         speed: []
-      });
+      }, Date.now());
   }
 
-  const sendJourneyReadings = async (index, spacecraftName, journeyId, temperature, pressure, speed, location) => {
+  const sendJourneyReadings = async (index, spacecraftName, journeyId, temperature, pressure, speed, location, startDate) => {
     if (index < 1000) {
       axios.all([
         axios.post(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/temperature', temperature.slice(index, writeBatchSize + index)),
@@ -209,14 +234,17 @@ export default function Home() {
         axios.post(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/speed', speed.slice(index, writeBatchSize + index))
       ]).then(responseArr => {
         setCurrentWriteMessage("Writing records " + index + " of " + temperature.length);
-        sendJourneyReadings(index + writeBatchSize, spacecraftName, journeyId, temperature, pressure, speed, location)
+        sendJourneyReadings(index + writeBatchSize, spacecraftName, journeyId, temperature, pressure, speed, location, startDate)
 
         if (index === writeBatchSize * 4) {
           fetchJourneyReadings(spacecraftName, journeyId);
         }
       });
     } else {
-      setCurrentWriteMessage("All rows have been written for this launch");
+      var endDate = Date.now();
+      var timeSpent = (endDate - startDate);
+      setJourneyWriteTime(timeSpent);
+      setCurrentWriteMessage("All rows have been written for this launch in " + (timeSpent / 1000).toFixed(0) + " seconds.");
     }
   }
 
@@ -278,21 +306,18 @@ export default function Home() {
           location_unit: "km,km,km"
         })
       }
-      //Now save this off 50 at a time
-      sendJourneyReadings(0, spacecraftName, journeyId, temperature, pressure, speed, location);
+      setJourneyWriteTime(null);
+      sendJourneyReadings(0, spacecraftName, journeyId, temperature, pressure, speed, location, Date.now());
     });
     fetchJourneys();
   }
 
   const testNewCreds = async (pkg) => {
-    const result = await axios.post(
+    const formData = new FormData();
+    formData.append('file', pkg.secureConnectBundle);
+    await axios.post(
       baseAddress + '/credentials/test?username=' + pkg.username + "&password=" + pkg.password + "&keyspace=" + pkg.keyspace,
-      pkg.secureConnectBundle,
-      {
-        headers: {
-          'Content-Type': 'text/plain'
-        }
-      }
+      formData
     ).then((res) => {
       sendSnackbarMessage("Test Successful", "success");
     }
@@ -302,16 +327,14 @@ export default function Home() {
   };
 
   const addNewCreds = async (pkg) => {
-    const result = await axios.post(
+    const formData = new FormData();
+    formData.append('file', pkg.secureConnectBundle);
+    await axios.post(
       baseAddress + '/credentials?username=' + pkg.username + "&password=" + pkg.password + "&keyspace=" + pkg.keyspace,
-      pkg.secureConnectBundle,
-      {
-        headers: {
-          'Content-Type': 'text/plain'
-        }
-      }
+      formData
     ).then((res) => {
       sendSnackbarMessage("Database Credentials Saved", "success");
+      setUserName(pkg.username);
       fetchJourneys();
       toggleAddCredsDialog();
     }
@@ -320,15 +343,21 @@ export default function Home() {
     });
   };
 
+  const handleCredsMenu = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCredMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <div className={classes.root}>
       <CssBaseline />
       <AppBar
         position="fixed"
-        className={clsx(classes.appBar, {
-          [classes.appBarShift]: open,
-        })}
+        className={clsx(classes.appBar)}
+        style={{ display: "flex" }}
       >
         <Toolbar>
           <IconButton
@@ -336,7 +365,7 @@ export default function Home() {
             aria-label="open drawer"
             onClick={toggleDrawer}
             edge="start"
-            className={clsx(classes.menuButton, open && classes.hide)}
+            className={clsx(classes.menuButton)}
           >
             <MenuIcon />
           </IconButton>
@@ -345,9 +374,45 @@ export default function Home() {
             alt="DataStax Logo"
             height="36px"
             width="174px" />
-          <Typography variant="h3" noWrap style={{ paddingLeft: theme.spacing(2) }}>
+          <Typography variant="h4" noWrap style={{ paddingLeft: theme.spacing(2) }}>
             Getting Started with Apollo
           </Typography>
+
+          <Button variant="contained" className={classes.button} onClick={toggleAddJourneyDialog} disabled={isPlaying}
+            style={{ marginLeft: "auto", marginRight: "auto" }}>
+            Launch New Journey
+          </Button>
+
+          <div>
+            <IconButton
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleCredsMenu}
+              color="inherit"
+            >
+              <AccountCircle />
+
+              <span style={{ paddingLeft: 5 }}>{username}</span>
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorEl)}
+              onClose={handleCredMenuClose}
+            >
+              <MenuItem onClick={toggleAddCredsDialog}>Switch Credentials</MenuItem>
+            </Menu>
+          </div>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -366,10 +431,8 @@ export default function Home() {
         </div>
         <Divider />
         <Journeys onClose={toggleDrawer}
-          onAddJourneyClick={toggleAddJourneyDialog}
           spacecraft={spacecraft}
           fetchJourney={fetchJourneyReadings}
-          onAddCreds={toggleAddCredsDialog}
         />
       </Drawer>
       <main
@@ -384,7 +447,14 @@ export default function Home() {
           sendMessage={sendSnackbarMessage}
           currentWriteMessage={currentWriteMessage}
           currentReadMessage={currentReadMessage}
-          autoPlay={autoPlay}
+          playing={isPlaying}
+          stopPlaying={togglePlayback}
+          journeyInformation={{
+            spacecraft_name: currentJourney.spacecraft_name,
+            journey_id: currentJourney.journey_id,
+            read_time: journeyReadTime,
+            write_time: journeyWriteTime,
+          }}
         />
       </main>
       <AddJourneyDialog open={openAddJourneyDialog} handleClose={toggleAddJourneyDialog} launchJourney={launchNewJourney} />
