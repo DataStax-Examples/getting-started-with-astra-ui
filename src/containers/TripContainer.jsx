@@ -4,11 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import ReactSpeedometer from "react-d3-speedometer";
 import { Scatter } from 'react-chartjs-2';
 import SummaryDialog from '../components/SummaryDialog';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import HUD from '../components/HUD';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -24,31 +20,6 @@ const useStyles = makeStyles(theme => ({
         position: 'absolute',
         zIndex: 100,
         bottom: 0
-    },
-    tableContainer: {
-        backgroundColor: 'black !important',
-        minHeight: '100vh'
-    },
-    table: {
-        zIndex: 100,
-        backgroundColor: "black",
-        border: "solid 1px #585858",
-        width: 650,
-        '& th': {
-            color: 'limegreen',
-            backgroundColor: "black",
-            fontWeight: "bold",
-            borderBottomColor: 'limegreen',
-            paddingTop: 0,
-            paddingBottom: 0
-        },
-        '& td': {
-            color: 'limegreen',
-            backgroundColor: "black",
-            borderBottomColor: 'limegreen',
-            paddingTop: 0,
-            paddingBottom: 0
-        }
     },
     gaugeContainer: {
         border: "solid 1px #585858",
@@ -78,7 +49,7 @@ export default function TripContainer(props) {
         location: { x_coordinate: 0, y_coordinate: 0, z_coordinate: 0 },
         index: 0
     });
-    const [currentInterval, setCurrentInterval] = useState(50);
+    const [currentInterval, setCurrentInterval] = useState(30);
     const [data, setData] = useState(props.data);
     const [openSummaryDialog, setOpenSummaryDialog] = useState(false);
 
@@ -215,64 +186,7 @@ export default function TripContainer(props) {
                 </div>
             }
             {props.playing &&
-                <Grid
-                    container
-                    spacing={0}
-                    direction="column"
-                    alignItems="center"
-                    justify="center"
-                    className={classes.tableContainer}
-                >
-
-                    <Grid item xs={12}>
-                        <Table className={classes.table} aria-label="simple table"
-                            dense
-                        >
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Apollo Table</TableCell>
-                                    <TableCell align="right">Rows Written</TableCell>
-                                    <TableCell align="right">Rows Read</TableCell>
-                                    <TableCell align="right">Current Row Displayed</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                <TableRow key="spacecraft_temperature_over_time">
-                                    <TableCell component="th" scope="row">
-                                        spacecraft_temperature_over_time
-                                    </TableCell>
-                                    <TableCell align="right">{props.currentWriteCount}</TableCell>
-                                    <TableCell align="right">{props.currentReadCount}</TableCell>
-                                    <TableCell align="right">{currentValues.index}</TableCell>
-                                </TableRow>
-                                <TableRow key="spacecraft_speed_over_time">
-                                    <TableCell component="th" scope="row">
-                                        spacecraft_speed_over_time
-                                    </TableCell>
-                                    <TableCell align="right">{props.currentWriteCount}</TableCell>
-                                    <TableCell align="right">{props.currentReadCount}</TableCell>
-                                    <TableCell align="right">{currentValues.index}</TableCell>
-                                </TableRow>
-                                <TableRow key="spacecraft_pressure_over_time">
-                                    <TableCell component="th" scope="row">
-                                        spacecraft_pressure_over_time
-                                    </TableCell>
-                                    <TableCell align="right">{props.currentWriteCount}</TableCell>
-                                    <TableCell align="right">{props.currentReadCount}</TableCell>
-                                    <TableCell align="right">{currentValues.index}</TableCell>
-                                </TableRow>
-                                <TableRow key="spacecraft_location_over_time">
-                                    <TableCell component="th" scope="row">
-                                        spacecraft_location_over_time
-                                    </TableCell>
-                                    <TableCell align="right">{props.currentWriteCount}</TableCell>
-                                    <TableCell align="right">{props.currentReadCount}</TableCell>
-                                    <TableCell align="right">{currentValues.index}</TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </Grid>
-                </Grid>
+                <HUD currentWriteCount={props.currentWriteCount} currentReadCount={props.currentReadCount} index={currentValues.index} />
             }
             <Grid container spacing={3} className={classes.grid}>
                 <Grid item xs={3}>
@@ -327,8 +241,14 @@ export default function TripContainer(props) {
                             <div style={{ border: "none", marginTop: -15 }}>
                                 <Scatter data={locationData} options={optionsCustom} legend={{ display: false }} height={200} />
                             </div>
+                            <div style={{ textAlign: "left", marginTop: -20, width: "100%" }}>
+                                <div style={{ width: 75, float: "left" }}>X: {currentValues.location.x_coordinate} </div>
+                                <div style={{ width: 75, float: "left" }}>Y: {currentValues.location.y_coordinate}</div>
+                            </div>
                         </div>
-                        Apollo Table: spacecraft_location_over_time
+                        <div>
+                            Apollo Table: spacecraft_location_over_time
+                        </div>
                     </div>
                 </Grid>
             </Grid>

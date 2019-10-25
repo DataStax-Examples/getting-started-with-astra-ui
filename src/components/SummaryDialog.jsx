@@ -70,11 +70,9 @@ export default function SummaryDialog(props) {
                             <ListItem className={classes.nopadding}>
                                 <ListItemText primary={<span>Read Duration: <strong>{(props.journeyInformation.read_time / 1000).toFixed(2)}</strong> seconds</span>} />
                             </ListItem>
-                            {props.journeyInformation.write_time && props.journeyInformation.write_time > 0 &&
-                                <ListItem className={classes.nopadding}>
-                                    <ListItemText primary={<span>Write Duration: <strong>{(props.journeyInformation.write_time / 1000).toFixed(2)}</strong> seconds</span>} />
-                                </ListItem>
-                            }
+                            <ListItem className={classes.nopadding}>
+                                <ListItemText primary={<span>Write Duration: <strong>{(props.journeyInformation.write_time / 1000).toFixed(2)}</strong> seconds</span>} />
+                            </ListItem>
                             <ListItem className={classes.nopadding}>
                                 <ListItemText primary="Database Tables Accessed"
 
