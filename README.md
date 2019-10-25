@@ -13,12 +13,25 @@ A short bulleted list of what the reader is expected to learn through this examp
 
 ### Running
 
-If you would like to set the api location this can be done in the `.env` file.  
+A `.env` file is required before you can build the application.  This file needs to be added to the root of the project and called `.env`.  This file
+contains all the environment variables required for the application.  Currently there is only one required entry:
+
+```BASE_ADDRESS=http://localhost:5000/api```
+
+This value is where you put the relative address of the api.
 
 In order to start this application you need to run:
 
-`npm install` and then 
+`npm install` 
+
+and then
+
+
 `npm run start`
+
+If you would like to build this for deployment then this can be accomplished using:
+
+`npm run build`
 
 ## How this Sample Works
 
