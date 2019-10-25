@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import ReactSpeedometer from "react-d3-speedometer";
 import { Scatter } from 'react-chartjs-2';
-import SummaryDialog from './SummaryDialog';
+import SummaryDialog from '../components/SummaryDialog';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -27,6 +27,7 @@ const useStyles = makeStyles(theme => ({
     },
     tableContainer: {
         backgroundColor: 'black !important',
+        minHeight: '100vh'
     },
     table: {
         zIndex: 100,
@@ -67,7 +68,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function TripContainer(props) {
     const classes = useStyles();
-    const [temperatureGauge, setTemperatureGauge] = useState({ min: 0, max: 100, units: "fahrenheit" });
+    const [temperatureGauge, setTemperatureGauge] = useState({ min: 0, max: 100, units: "Fahrenheit" });
     const [pressureGauge, setPressureGauge] = useState({ min: 90, max: 105, units: "kPa" });
     const [speedGauge, setSpeedGauge] = useState({ min: 20000, max: 40000, units: "km/h" });
     const [currentValues, setCurrentValues] = useState({
@@ -140,6 +141,7 @@ export default function TripContainer(props) {
         }, [delay]);
     }
 
+    //Data setup for the Scatter plot
     const locationData = {
         labels: ['Scatter'],
         datasets: [
@@ -166,6 +168,7 @@ export default function TripContainer(props) {
         ]
     };
 
+    //Options setup for the scatter plot
     const optionsCustom = {
         responsive: false,
         maintainAspectRation: false,
@@ -218,7 +221,6 @@ export default function TripContainer(props) {
                     direction="column"
                     alignItems="center"
                     justify="center"
-                    style={{ minHeight: '100vh' }}
                     className={classes.tableContainer}
                 >
 

@@ -13,13 +13,13 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Snackbar from '@material-ui/core/Snackbar';
-import Journeys from './Journeys';
+import Journeys from '../components/Journeys';
 import TripContainer from './TripContainer';
-import AddJourneyDialog from './AddJourneyDialog';
+import AddJourneyDialog from '../components/AddJourneyDialog';
 import logo from '../assets/logo-white.svg'
-import CredentialsDialog from './CredentialsDialog'
-import SnackbarContentWrapper from './SnackbarContentWrapper';
-import LaunchDialog from './LaunchDialog';
+import CredentialsDialog from '../components/CredentialsDialog'
+import SnackbarContentWrapper from '../components/SnackbarContentWrapper';
+import LaunchDialog from '../components/LaunchDialog';
 import Button from '@material-ui/core/Button';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -88,7 +88,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function Home() {
+export default function HomeContainer() {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -105,8 +105,6 @@ export default function Home() {
   const [currentWriteTime, setCurrentWriteTime] = React.useState(0);
   const [openLaunchDialog, setOpenLaunchDialog] = React.useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [journeyReadTime, setJourneyReadTime] = React.useState(null);
-  const [journeyWriteTime, setJourneyWriteTime] = React.useState(null);
   const [currentJourney, setCurrentJourney] = React.useState({ spacecraft_name: "", journey_id: "" });
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -173,8 +171,8 @@ export default function Home() {
     setSnackbarClass(msgType || "info");
   }
 
-  const fetchJourneyReadings = (spacecraftName, journeyId) => {
-    async function fetchData(readingsPageStates, readings, startDate) {
+  const fetchJourneyData = (spacecraftName, journeyId) => {
+    async function fetchJourneyReadings(spacecraftName, journeyId, readingsPageStates, readings, startDate) {
       axios.all([
         axios.get(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/temperature?pagesize=' + pageSize + readingsPageStates.temperature),
         axios.get(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/pressure?pagesize=' + pageSize + readingsPageStates.pressure),
@@ -196,7 +194,7 @@ export default function Home() {
         };
         //If we are not at the end then fetch more data
         if (responseArr[0].data.data && responseArr[0].data.data.length > 0) {
-          fetchData(readingsPageStates, readings, startDate);
+          fetchJourneyReadings(spacecraftName, journeyId, readingsPageStates, readings, startDate);
           if (readings.temperature.length && !isPlaying) //Auto start the replay
           {
             setIsPlaying(true);
@@ -205,14 +203,14 @@ export default function Home() {
         } else {
           var endDate = Date.now();
           var timeSpent = (endDate - startDate);
-          setJourneyReadTime(timeSpent);
           setCurrentReadTime(timeSpent);
         }
       });
     }
     setCurrentJourney({ spacecraft_name: spacecraftName, journey_id: journeyId });
-    setJourneyReadTime(null);
-    fetchData({
+    setCurrentReadTime(0);
+    setCurrentReadCount(0);
+    fetchJourneyReadings(spacecraftName, journeyId, {
       temperature: "",
       pressure: "",
       location: "",
@@ -235,15 +233,12 @@ export default function Home() {
         axios.post(baseAddress + '/spacecraft/' + spacecraftName + '/' + journeyId + '/instruments/speed', speed.slice(index, writeBatchSize + index))
       ]).then(responseArr => {
         setCurrentWriteCount(index);
-        if (index === (writeBatchSize * 4)) {
-          fetchJourneyReadings(spacecraftName, journeyId);
-        }
         sendJourneyReadings(index + writeBatchSize, spacecraftName, journeyId, temperature, pressure, speed, location, startDate)
       });
     } else {
       var endDate = Date.now();
       var timeSpent = (endDate - startDate);
-      setJourneyWriteTime(timeSpent);
+      fetchJourneyData(spacecraftName, journeyId);
       setCurrentWriteCount(index);
       setCurrentWriteTime(timeSpent);
     }
@@ -252,7 +247,7 @@ export default function Home() {
   const launchNewJourney = async (spacecraftName, summary) => {
     setIsPlaying(false);
     setOpenLaunchDialog(true);
-    const result = await axios.post(
+    await axios.post(
       baseAddress + '/spacecraft/' + spacecraftName,
       JSON.stringify(summary || ""),
       {
@@ -308,7 +303,9 @@ export default function Home() {
           location_unit: "km,km,km"
         })
       }
-      setJourneyWriteTime(null);
+      setCurrentWriteTime(null);
+      setCurrentWriteCount(0);
+      setCurrentReadCount(0);
       sendJourneyReadings(0, spacecraftName, journeyId, temperature, pressure, speed, location, Date.now());
     });
     fetchJourneys();
@@ -324,7 +321,7 @@ export default function Home() {
       sendSnackbarMessage("Test Successful", "success");
     }
     ).catch((err) => {
-      sendSnackbarMessage(err.response.data, "error");
+      sendSnackbarMessage("A problem occurred with your credentials.  Please verify them and try again.", "error");
     });
   };
 
@@ -431,7 +428,7 @@ export default function Home() {
         <Divider />
         <Journeys onClose={toggleDrawer}
           spacecraft={spacecraft}
-          fetchJourney={fetchJourneyReadings}
+          fetchJourney={fetchJourneyData}
         />
       </Drawer>
       <main

@@ -13,7 +13,8 @@ export default function LaunchDialog(props) {
         "T-2",
         "T-1 - Liftoff"
     ]
-    useInterval(() => {
+
+    useInterval(() => {     //Cycles through the messages
         if (props.open) {
             setIndex(index + 1)
             if (index + 1 === messages.length) {
@@ -48,9 +49,7 @@ export default function LaunchDialog(props) {
             <Dialog open={props.open} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Preparing for your Launch</DialogTitle>
                 <DialogContent>
-                    <DialogContentText
-                        align={"center"}
-                    >
+                    <DialogContentText align={"center"} >
                         {messages[index]}
                     </DialogContentText>
                 </DialogContent>

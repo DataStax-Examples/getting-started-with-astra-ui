@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import { blue } from '@material-ui/core/colors';
 import TextField from '@material-ui/core/TextField';
 
 export default function AddJourneyDialog(props) {
@@ -67,10 +65,10 @@ export default function AddJourneyDialog(props) {
                 <DialogActions>
                     <Button onClick={props.handleClose} color="primary">
                         Cancel
-          </Button>
+                    </Button>
                     <Button variant="contained" onClick={onLaunch} color="primary">
                         Launch
-          </Button>
+                    </Button>
                 </DialogActions>
             </Dialog>
         </div>
