@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import ReactSpeedometer from "react-d3-speedometer";
-import { Scatter } from 'react-chartjs-2';
 import SummaryDialog from '../components/SummaryDialog';
 import HUD from '../components/HUD';
+import LocationDisplay from '../components/LocationDisplay';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -112,73 +112,6 @@ export default function TripContainer(props) {
         }, [delay]);
     }
 
-    //Data setup for the Scatter plot
-    const locationData = {
-        labels: ['Scatter'],
-        datasets: [
-            {
-                fill: false,
-                backgroundColor: 'green',
-                color: 'green',
-                pointBorderColor: 'green',
-                pointBackgroundColor: 'green',
-                pointBorderWidth: 1,
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-                pointHoverBorderColor: 'rgba(220,220,220,1)',
-                pointHoverBorderWidth: 2,
-                pointRadius: 7,
-                pointHitRadius: 10,
-                data: [
-                    {
-                        x: currentValues.location ? currentValues.location.x_coordinate : 0,
-                        y: currentValues.location ? currentValues.location.y_coordinate : 0,
-                    }
-                ]
-            }
-        ]
-    };
-
-    //Options setup for the scatter plot
-    const optionsCustom = {
-        responsive: false,
-        maintainAspectRation: false,
-        tooltips: {
-            mode: 'label'
-        },
-        elements: {
-            line: {
-                fill: false
-            }
-        },
-        scales: {
-            xAxes: [{
-                type: 'linear',
-                ticks: {
-                    min: 10000,
-                    max: 15000,
-                    display: false
-                },
-                display: true,
-                gridLines: {
-                    color: "green",
-                }
-            }],
-            yAxes: [{
-                type: 'linear',
-                ticks: {
-                    min: 10000,
-                    max: 15000,
-                    display: false
-                },
-                display: true,
-                gridLines: {
-                    color: "green",
-                }
-            }],
-        }
-    };
-
     return (
         <div className={classes.root}>
             {props.playing &&
@@ -238,17 +171,9 @@ export default function TripContainer(props) {
                 <Grid item xs={3}>
                     <div className={classes.gaugeContainer}>
                         <div className={classes.gauge}>
-                            <div style={{ border: "none", marginTop: -15 }}>
-                                <Scatter data={locationData} options={optionsCustom} legend={{ display: false }} height={200} />
-                            </div>
-                            <div style={{ textAlign: "left", marginTop: -20, width: "100%" }}>
-                                <div style={{ width: 75, float: "left" }}>X: {currentValues.location.x_coordinate} </div>
-                                <div style={{ width: 75, float: "left" }}>Y: {currentValues.location.y_coordinate}</div>
-                            </div>
+                            <LocationDisplay location={currentValues.location} />
                         </div>
-                        <div>
-                            Apollo Table: spacecraft_location_over_time
-                        </div>
+                        Apollo Table: spacecraft_location_over_time
                     </div>
                 </Grid>
             </Grid>
