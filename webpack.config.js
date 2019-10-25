@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const dotenv = require('dotenv');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 
 const dev = process.env.NODE_ENV !== 'production';
@@ -73,5 +74,10 @@ module.exports = {
   plugins: dev
     ? [HTMLWebpackPluginConfig, new webpack.HotModuleReplacementPlugin(), new webpack.DefinePlugin(envKeys)]
     : [HTMLWebpackPluginConfig, DefinePluginConfig,
-      new webpack.DefinePlugin(envKeys)],
+      new webpack.DefinePlugin(envKeys),
+      new CopyWebpackPlugin([
+        // relative path is from src
+        { from: './favicon.ico' }, // <- your path to favicon
+      ])
+    ],
 };
