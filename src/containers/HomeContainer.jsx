@@ -406,7 +406,7 @@ export default function HomeContainer() {
               open={Boolean(anchorEl)}
               onClose={handleCredMenuClose}
             >
-              <MenuItem onClick={toggleAddCredsDialog}>Switch Credentials</MenuItem>
+              <MenuItem onClick={toggleAddCredsDialog}>Modify Apollo Database Connection</MenuItem>
             </Menu>
           </div>
         </Toolbar>

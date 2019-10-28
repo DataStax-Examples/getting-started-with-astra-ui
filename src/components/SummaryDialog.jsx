@@ -78,11 +78,11 @@ export default function SummaryDialog(props) {
 
                                     secondary={
                                         <ul className={classes.nested}>
-                                            <li>spacecraft_journey_catalog: <strong>1</strong> row affected</li>
-                                            <li>spacecraft_speed_over_time: <strong>1000</strong> row affected</li>
-                                            <li>spacecraft_location_over_time: <strong>1000</strong> rows affected</li>
-                                            <li>spacecraft_temperature_over_time: <strong>1000</strong> rows affected</li>
-                                            <li>spacecraft_pressure_over_time: <strong>1000</strong> rows affected</li>
+                                            <li>spacecraft_journey_catalog: <strong>1</strong> row written &amp; read</li>
+                                            <li>spacecraft_speed_over_time: <strong>1000</strong> rows written &amp; read</li>
+                                            <li>spacecraft_location_over_time: <strong>1000</strong> rows written &amp; read</li>
+                                            <li>spacecraft_temperature_over_time: <strong>1000</strong> rows written &amp; read</li>
+                                            <li>spacecraft_pressure_over_time: <strong>1000</strong> rows written &amp; read</li>
                                         </ul>
                                     } />
                             </ListItem>
