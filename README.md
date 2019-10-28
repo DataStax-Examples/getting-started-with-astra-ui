@@ -4,7 +4,7 @@ This provides the front end for the Apollo Getting Started application.  This is
 
 * [Java](https://github.com/DataStax-Examples/getting-started-with-apollo-java)
 * [Python](https://github.com/DataStax-Examples/getting-started-with-apollo-python)
-* [C#](https://github.com/DataStax-Examples/getting-started-with-apollo-ui)
+* [C#](https://github.com/DataStax-Examples/getting-started-with-apollo-csharp)
 * [NodeJS]() - TBD
 
 ## Objectives
