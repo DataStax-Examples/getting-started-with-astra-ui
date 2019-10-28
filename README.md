@@ -50,5 +50,5 @@ If you create a new journey, you will enter a name for it.  Once you click launc
 
 If you choose to replay an existing journey once you click on the journey to replay the application will begin to read the sensors back in a paged manner and once data has been returned to the UI the system will begin the playback.
 
-Attribution
+## Attribution
 Created and Maintained by [bechbd](https://github.com/bechbd)
