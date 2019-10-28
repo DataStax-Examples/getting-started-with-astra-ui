@@ -8,7 +8,9 @@ This provides the front end for the Apollo Getting Started application.  This is
 * [NodeJS]() - TBD
 
 ## Objectives
-A short bulleted list of what the reader is expected to learn through this example
+
+* Connect a web application to one of four backends to demonstrate an end to end full stack application
+* Demonstrate how to properly page results for an Apollo Service
 
 ## Setup and Running
 
@@ -33,6 +35,15 @@ and then
 
 
 `npm run start`
+
+You will know that this is correctly running when you see this message in your terminal:
+
+```
+ℹ ｢wds｣: Project is running at http://localhost:3000/
+ℹ ｢wds｣: webpack output is served from /
+ℹ ｢wds｣: Content not from webpack is served from /Users/dave.bechberger/Documents/projects/bechbd/getting-started-with-apollo-ui
+ℹ ｢wds｣: 404s will fallback to /index.html
+```
 
 If you would like to build this for deployment then this can be accomplished using:
 
