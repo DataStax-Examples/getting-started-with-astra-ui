@@ -1,9 +1,16 @@
-# getting-started-with-apollo-csharp
+# Getting Started with Apollo - UI
 
-This provides the front end for the Apollo Getting Started application.
+This provides the front end for the Apollo Getting Started application.  This is meant to be used with one of the following backends:
+
+* [Java](https://github.com/DataStax-Examples/getting-started-with-apollo-java)
+* [Python](https://github.com/DataStax-Examples/getting-started-with-apollo-python)
+* [C#](https://github.com/DataStax-Examples/getting-started-with-apollo-csharp)
+* [NodeJS]() - TBD
 
 ## Objectives
-A short bulleted list of what the reader is expected to learn through this example
+
+* Connect a web application to one of four backends to demonstrate an end to end full stack application
+* Demonstrate how to properly page results for an Apollo Service
 
 ## Setup and Running
 
@@ -29,6 +36,15 @@ and then
 
 `npm run start`
 
+You will know that this is correctly running when you see this message in your terminal:
+
+```
+ℹ ｢wds｣: Project is running at http://localhost:3000/
+ℹ ｢wds｣: webpack output is served from /
+ℹ ｢wds｣: Content not from webpack is served from /Users/dave.bechberger/Documents/projects/bechbd/getting-started-with-apollo-ui
+ℹ ｢wds｣: 404s will fallback to /index.html
+```
+
 If you would like to build this for deployment then this can be accomplished using:
 
 `npm run build`
@@ -45,5 +61,5 @@ If you create a new journey, you will enter a name for it.  Once you click launc
 
 If you choose to replay an existing journey once you click on the journey to replay the application will begin to read the sensors back in a paged manner and once data has been returned to the UI the system will begin the playback.
 
-Attribution
+## Attribution
 Created and Maintained by [bechbd](https://github.com/bechbd)
