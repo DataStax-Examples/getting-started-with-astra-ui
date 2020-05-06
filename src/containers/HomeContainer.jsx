@@ -373,7 +373,7 @@ export default function HomeContainer() {
             height="36px"
             width="174px" />
           <Typography variant="h4" noWrap style={{ paddingLeft: theme.spacing(2) }}>
-            Getting Started with Apollo
+            Getting Started with Astra
           </Typography>
 
           <Button variant="contained" className={classes.button} onClick={toggleAddJourneyDialog}
@@ -406,7 +406,7 @@ export default function HomeContainer() {
               open={Boolean(anchorEl)}
               onClose={handleCredMenuClose}
             >
-              <MenuItem onClick={toggleAddCredsDialog}>Modify Apollo Database Connection</MenuItem>
+              <MenuItem onClick={toggleAddCredsDialog}>Modify Astra Database Connection</MenuItem>
             </Menu>
           </div>
         </Toolbar>

@@ -134,7 +134,7 @@ export default function TripContainer(props) {
                             />
 
                         </div>
-                        Apollo Table: spacecraft_temperature_over_time
+                        Astra Table: spacecraft_temperature_over_time
                     </div>
                 </Grid>
                 <Grid item xs={3}>
@@ -151,7 +151,7 @@ export default function TripContainer(props) {
                                 }}
                             />
                         </div>
-                        Apollo Table: spacecraft_speed_over_time
+                        Astra Table: spacecraft_speed_over_time
                     </div>
                 </Grid>
                 <Grid item xs={3}>
@@ -165,7 +165,7 @@ export default function TripContainer(props) {
                                 segmentColors={['green', 'limegreen', 'yellow', 'orange', 'red']}
                             />
                         </div>
-                        Apollo Table: spacecraft_pressure_over_time
+                        Astra Table: spacecraft_pressure_over_time
                     </div>
                 </Grid>
                 <Grid item xs={3}>
@@ -173,7 +173,7 @@ export default function TripContainer(props) {
                         <div className={classes.gauge}>
                             <LocationDisplay location={currentValues.location} />
                         </div>
-                        Apollo Table: spacecraft_location_over_time
+                        Astra Table: spacecraft_location_over_time
                     </div>
                 </Grid>
             </Grid>

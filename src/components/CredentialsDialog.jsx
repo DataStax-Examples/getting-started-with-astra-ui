@@ -58,10 +58,10 @@ export default function CredentialsDialog(props) {
     return (
         <div>
             <Dialog open={props.open} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Connect to your Apollo Database</DialogTitle>
+                <DialogTitle id="form-dialog-title">Connect to your Astra Database</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Please enter the following information to connect to your Apollo instance
+                        Please enter the following information to connect to your Astra instance
                     </DialogContentText>
                     <TextField
                         autoFocus
