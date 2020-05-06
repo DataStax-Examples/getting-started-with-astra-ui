@@ -75,7 +75,7 @@ export default function AddJourneyDialog(props) {
                                     <CheckBoxOutlineBlankIcon style={{ fill: "limegreen" }} />}
                             </ListItemIcon>
                             <ListItemText
-                                primary="Writing 1000 Rows to Apollo" />
+                                primary="Writing 1000 Rows to Astra" />
                         </ListItem>
                         <ListItem>
                             <ListItemIcon>
@@ -87,7 +87,7 @@ export default function AddJourneyDialog(props) {
                                     <CheckBoxOutlineBlankIcon style={{ fill: "limegreen" }} />}
                             </ListItemIcon>
                             <ListItemText
-                                primary="Reading 1000 Rows from Apollo" />
+                                primary="Reading 1000 Rows from Astra" />
                         </ListItem>
                         <ListItem>
                             <ListItemIcon>
@@ -110,7 +110,7 @@ export default function AddJourneyDialog(props) {
                 >
                     <TableHead>
                         <TableRow>
-                            <TableCell>Apollo Table</TableCell>
+                            <TableCell>Astra Table</TableCell>
                             <TableCell align="right">Rows Written</TableCell>
                             <TableCell align="right">Rows Read</TableCell>
                             <TableCell align="right">Current Row Displayed</TableCell>

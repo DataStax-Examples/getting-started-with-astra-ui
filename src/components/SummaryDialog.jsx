@@ -92,7 +92,7 @@ export default function SummaryDialog(props) {
                                         <ul className={classes.nested}>
                                             <li>To <strong>learn</strong> from the experts, start your <a href="www.datastax.com">DataStax Academy learning path</a>.</li>
                                             <li>To <strong>see</strong> the code for this example, go to the <a href="www.datastax.com">source code</a>.</li>
-                                            <li>To <strong>read</strong> about Apollo details and tooling, go to the <a href="www.datastax.com">documentation</a>.</li>
+                                            <li>To <strong>read</strong> about Astra details and tooling, go to the <a href="www.datastax.com">documentation</a>.</li>
                                         </ul>
                                     } />
                             </ListItem>

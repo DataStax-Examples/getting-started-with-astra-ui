@@ -34,8 +34,8 @@ export default function AddJourneyDialog(props) {
                     <ol>
                             <li>A new journey is created for the spacecraft</li>
                             <li>One thousand sensor readings are generated for speed, pressure, temperature, and location</li>
-                            <li>These sensor readings are saved to the Apollo tables one hundred at a time</li>
-                            <li>The sensor readings are read back from Apollo twenty five at a time</li>
+                            <li>These sensor readings are saved to the Astra tables one hundred at a time</li>
+                            <li>The sensor readings are read back from Astra twenty five at a time</li>
                             <li>The readings are displayed with it being updated every fifty milliseconds</li>
                             <li>Once the journey is complete a summary tells you how quickly the data was written and read from the client</li>
                         </ol>

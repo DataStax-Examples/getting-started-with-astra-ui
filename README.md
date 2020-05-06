@@ -1,16 +1,16 @@
-# Getting Started with Apollo - UI
+# Getting Started with Astra - UI
 
-This provides the front end for the Apollo Getting Started application.  This is meant to be used with one of the following backends:
+This provides the front end for the Astra Getting Started application.  This is meant to be used with one of the following backends:
 
-* [Java](https://github.com/DataStax-Examples/getting-started-with-apollo-java)
-* [Python](https://github.com/DataStax-Examples/getting-started-with-apollo-python)
-* [C#](https://github.com/DataStax-Examples/getting-started-with-apollo-csharp)
+* [Java](https://github.com/DataStax-Examples/getting-started-with-astra-java)
+* [Python](https://github.com/DataStax-Examples/getting-started-with-astra-python)
+* [C#](https://github.com/DataStax-Examples/getting-started-with-astra-csharp)
 * [NodeJS]() - TBD
 
 ## Objectives
 
 * Connect a web application to one of four backends to demonstrate an end to end full stack application
-* Demonstrate how to properly page results for an Apollo Service
+* Demonstrate how to properly page results for an Astra Service
 
 ## Setup and Running
 
@@ -41,7 +41,7 @@ You will know that this is correctly running when you see this message in your t
 ```
 ℹ ｢wds｣: Project is running at http://localhost:3000/
 ℹ ｢wds｣: webpack output is served from /
-ℹ ｢wds｣: Content not from webpack is served from /Users/dave.bechberger/Documents/projects/bechbd/getting-started-with-apollo-ui
+ℹ ｢wds｣: Content not from webpack is served from /Users/dave.bechberger/Documents/projects/bechbd/getting-started-with-astra-ui
 ℹ ｢wds｣: 404s will fallback to /index.html
 ```
 
@@ -51,9 +51,9 @@ If you would like to build this for deployment then this can be accomplished usi
 
 ## How this Sample Works
 
-This is am example UI which connects to an Apollo database.
+This is am example UI which connects to an Astra database.
 
-Upon entering the application you will be prompted to add your credentials for the Apollo database you want to connect to.
+Upon entering the application you will be prompted to add your credentials for the Astra database you want to connect to.
 
 Once you have entered your credentials you will be given the option of either creating a new journey or replaying an existing one.
 
