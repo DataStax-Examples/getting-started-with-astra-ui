@@ -51,7 +51,7 @@ If you would like to build this for deployment then this can be accomplished usi
 
 ## How this Sample Works
 
-This is am example UI which connects to an Astra database.
+This is an example UI which connects to an Astra database.
 
 Upon entering the application you will be prompted to add your credentials for the Astra database you want to connect to.
 
