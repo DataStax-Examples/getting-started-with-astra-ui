@@ -1,4 +1,4 @@
-# Getting Started with Astra - UI
+# Getting Started with DataStax Astra - UI
 
 This provides the front end for the Astra Getting Started application.  This is meant to be used with one of the following backends:
 
