@@ -17,6 +17,7 @@ This provides the front end for the Astra Getting Started application.  This is 
 ### Prerequisites
 
 * node v8.1.0
+* DataStax Astra - Create a free-forever Cassandra Database with DataStax Astra: [click here to get started](https://astra.datastax.com/register?utm_source=devplay&utm_medium=github&utm_campaign=getting-started-with-astra-ui) 🚀
 
 ### Running
 
